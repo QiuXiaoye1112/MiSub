@@ -16,7 +16,6 @@ import { detectLegacyD1 } from './lib/api.js';
 const Login = defineAsyncComponent(() => import('./components/modals/Login.vue'));
 const NotFound = defineAsyncComponent(() => import('./views/NotFound.vue'));
 const Toast = defineAsyncComponent(() => import('./components/ui/Toast.vue'));
-const Footer = defineAsyncComponent(() => import('./components/layout/Footer.vue'));
 const Dashboard = defineAsyncComponent(() => import('./components/features/Dashboard/Dashboard.vue'));
 const Header = defineAsyncComponent(() => import('./components/layout/Header.vue'));
 const SavePrompt = defineAsyncComponent(() => import('./components/ui/SavePrompt.vue'));
@@ -54,18 +53,9 @@ const isPublicRoute = computed(() => route.meta.isPublic);
 const isSessionLoading = computed(() => sessionState.value === 'loading');
 
 const showModernNavBar = computed(() => isLoggedIn.value && layoutMode.value === 'modern');
-const shouldHidePublicBranding = computed(() => {
-  if (isLoggedIn.value || !isPublicRoute.value) return false;
-  return sessionStore.publicConfig?.customPage?.enabled === true && sessionStore.publicConfig?.customPage?.hideBranding === true;
-});
 const shouldHidePublicHeader = computed(() => {
   if (isLoggedIn.value || !isPublicRoute.value) return false;
   return sessionStore.publicConfig?.customPage?.enabled === true && sessionStore.publicConfig?.customPage?.hideHeader === true;
-});
-
-const shouldHidePublicFooter = computed(() => {
-  if (isLoggedIn.value || !isPublicRoute.value) return false;
-  return sessionStore.publicConfig?.customPage?.enabled === true && sessionStore.publicConfig?.customPage?.hideFooter === true;
 });
 
 const showLegacyHeader = computed(() => {
@@ -74,10 +64,6 @@ const showLegacyHeader = computed(() => {
   if (isSessionLoading.value || !isPublicRoute.value) return false;
   return !shouldHidePublicHeader.value;
 });
-const showPublicFooter = computed(() => {
-  return !shouldHidePublicFooter.value;
-});
-const shouldShowFooter = computed(() => isLoggedIn.value && !isSessionLoading.value);
 
 const shouldCenterMain = computed(() =>
   sessionState.value !== 'loggedIn' &&
@@ -288,7 +274,6 @@ aria-live="polite"
       @confirm="handleVersionModalConfirm"
       @suppress="handleVersionModalSuppress"
     />
-    <Footer v-if="shouldShowFooter" :hide-branding="shouldHidePublicBranding" />
 <ScrollToTop v-if="isLoggedIn || isPublicRoute" />
 </div>
 </template>
