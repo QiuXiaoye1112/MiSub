@@ -429,7 +429,7 @@ const prependGroupName = profilePrefixSettings?.prependGroupName ?? false;
     }
 
     // --- 阶段 2: 核心转换引擎 (Logic Transformation Engine) ---
-    // 优先级: 订阅组 Operator Chain > 全局默认 Operator Chain > 旧版 Node Pipeline (桥接模式)
+    // 仅使用订阅组自己的节点处理规则。
     
     let activeOperators = [];
     
@@ -438,13 +438,8 @@ const prependGroupName = profilePrefixSettings?.prependGroupName ?? false;
         activeOperators = ensureArray(profilePrefixSettings.operators);
     } 
     
-    if (!activeOperators.length && config.defaultOperators) {
-        activeOperators = ensureArray(config.defaultOperators);
-    } 
-    
     if (!activeOperators.length) {
-        const legacyConfig = nodeTransformConfig?.enabled ? nodeTransformConfig : config.defaultNodeTransform;
-        activeOperators = adaptLegacyTransform(legacyConfig);
+        activeOperators = adaptLegacyTransform(nodeTransformConfig?.enabled ? nodeTransformConfig : null);
     }
 
     // 2.1 执行 Workflow 链式处理 (算子操作)

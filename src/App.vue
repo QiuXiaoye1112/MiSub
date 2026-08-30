@@ -77,7 +77,7 @@ const showLegacyHeader = computed(() => {
 const showPublicFooter = computed(() => {
   return !shouldHidePublicFooter.value;
 });
-const shouldShowFooter = computed(() => !isSessionLoading.value && (!isPublicRoute.value || showPublicFooter.value));
+const shouldShowFooter = computed(() => isLoggedIn.value && !isSessionLoading.value);
 
 const shouldCenterMain = computed(() =>
   sessionState.value !== 'loggedIn' &&

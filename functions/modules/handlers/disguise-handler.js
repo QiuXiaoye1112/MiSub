@@ -68,7 +68,7 @@ export async function handleDisguiseRequest(context, preloadedSettings = null) {
     // [Public Page Logic]
     // If Public Page is enabled, we allow access to root '/' and '/explore'.
     // NOTE: We do NOT automatically allow /login here anymore if disguise is on.
-    const isPublicAccessAllowed = settings.enablePublicPage && (url.pathname === '/' || url.pathname === '/explore');
+    const isPublicAccessAllowed = url.pathname === '/' || (settings.enablePublicPage && url.pathname === '/explore');
     if (isPublicAccessAllowed) {
         return null; // Allow access
     }

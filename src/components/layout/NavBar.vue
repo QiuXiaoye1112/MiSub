@@ -13,7 +13,6 @@ const route = useRoute();
 const uiStore = useUIStore();
 const sessionStore = useSessionStore();
 const { publicConfig } = storeToRefs(sessionStore);
-const isPublicEnabled = computed(() => publicConfig.value?.enablePublicPage === true);
 const hideBranding = computed(() => publicConfig.value?.customPage?.enabled === true && publicConfig.value?.customPage?.hideBranding === true);
 
 defineProps({
@@ -40,7 +39,7 @@ function isActive(path) {
 
     <NavActionGroup
       :is-logged-in="isLoggedIn"
-      :show-explore="isPublicEnabled"
+       :show-explore="false"
       :hide-external-repo="hideBranding"
       :with-focus-ring="true"
       rounded-class="rounded-full"
@@ -80,7 +79,7 @@ function isActive(path) {
       <div class="flex items-center pl-5 ml-3 gap-2">
         <NavActionGroup
           :is-logged-in="isLoggedIn"
-          :show-explore="isPublicEnabled"
+           :show-explore="false"
           :hide-external-repo="hideBranding"
           :with-focus-ring="true"
           :show-divider="true"

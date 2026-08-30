@@ -107,12 +107,7 @@ export const POLICY_GROUPS = {
     // 基础配置：精简版
     BASE: (proxies) => {
         const proxyNames = proxies.map(p => p.tag || p.name);
-        return [
-            { name: DEFAULT_SELECT_GROUP, type: 'select', proxies: [AUTO_SELECT_GROUP, FALLBACK_GROUP, MANUAL_SELECT_GROUP, 'DIRECT'] },
-            { name: AUTO_SELECT_GROUP, type: 'url-test', proxies: proxyNames },
-            { name: FALLBACK_GROUP, type: 'fallback', proxies: proxyNames },
-            { name: MANUAL_SELECT_GROUP, type: 'select', proxies: proxyNames }
-        ];
+        return [{ name: DEFAULT_SELECT_GROUP, type: 'select', proxies: proxyNames }];
     },
     // 标准配置：全能型
     STD: (proxies) => {

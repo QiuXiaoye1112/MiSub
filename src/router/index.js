@@ -7,20 +7,21 @@ const ManualNodesView = () => import('../views/ManualNodesView.vue');
 const MySubscriptionsView = () => import('../views/MySubscriptionsView.vue');
 const SettingsView = () => import('../views/SettingsView.vue');
 
-const HomeView = () => import('../views/HomeView.vue'); // [NEW] Wrapper View
+const HomeView = () => import('../views/HomeView.vue');
 
 const routes = [
     {
-        path: '/',  // Root path is HomeView (Smart Wrapper)
+        path: '/',
         name: 'Home',
         component: HomeView,
-        meta: { title: '首页', isPublic: true } // Publicly accessible, view handles content
+        // The root URL is the login entry. Logged-in users are redirected by HomeView.
+        meta: { title: '登录', isPublic: false }
     },
     {
         path: '/explore',
         name: 'Explore',
-        component: HomeView,
-        meta: { title: '公开页', isPublic: true }
+        redirect: '/dashboard',
+        meta: { title: '仪表盘' }
     },
     {
         path: '/dashboard',

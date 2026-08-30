@@ -49,7 +49,7 @@ export function useProfiles(markDirty) {
       subscriptions: [], 
       manualNodes: [], 
       customId: '', 
-      transformConfigMode: 'global', 
+      transformConfigMode: 'builtin',
       transformConfig: '', 
       ruleLevel: '', 
       expiresAt: '',
@@ -64,7 +64,7 @@ export function useProfiles(markDirty) {
       isNewProfile.value = false;
       editingProfile.value = JSON.parse(JSON.stringify(profile));
       if (!editingProfile.value.transformConfigMode) {
-        editingProfile.value.transformConfigMode = editingProfile.value.transformConfig ? 'preset' : 'global';
+        editingProfile.value.transformConfigMode = editingProfile.value.transformConfig ? 'preset' : 'builtin';
       }
       if (!editingProfile.value.ruleLevel && editingProfile.value.clashRuleLevel) {
         editingProfile.value.ruleLevel = editingProfile.value.clashRuleLevel;

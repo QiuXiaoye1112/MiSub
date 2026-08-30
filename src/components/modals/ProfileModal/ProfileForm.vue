@@ -47,7 +47,6 @@ const globalConfigLabel = computed(() => {
 });
 
 const transformModeOptions = [
-  { value: 'global', label: '跟随全局设置' },
   { value: 'preset', label: '选择预设方案' },
   { value: 'custom', label: '自定义规则模板 URL' }
 ];
@@ -187,8 +186,7 @@ watch(
               v-model="localProfile.subconverter.engineMode"
               class="block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 misub-radius-md focus:ring-indigo-500 sm:text-sm dark:text-white transition-all font-medium"
             >
-              <option value="">跟随全局配置</option>
-              <option v-for="opt in engineOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+               <option v-for="opt in engineOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
             </select>
             <div v-if="localProfile.subconverter.engineMode === ''" class="flex items-center gap-1.5 mt-1.5">
                <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
@@ -205,8 +203,7 @@ watch(
               v-model="localProfile.transformConfigMode"
               class="block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 misub-radius-md focus:ring-indigo-500 sm:text-sm dark:text-white"
             >
-              <option value="global">跟随全局方案</option>
-              <option value="builtin" :disabled="isExternalEngine">内置自动分流</option>
+               <option value="builtin" :disabled="isExternalEngine">内置自动分流</option>
               <option v-for="option in transformModeOptions.slice(1)" :key="option.value" :value="option.value">
                 {{ option.label }}
               </option>
@@ -214,12 +211,6 @@ watch(
             <p v-if="isExternalEngine" class="mt-1 text-[10px] leading-relaxed text-amber-600 dark:text-amber-400">
               第三方后端不支持 MiSub 内置规则源与内置模板，请选择预设远程模板或自定义 URL。
             </p>
-            <div v-if="localProfile.transformConfigMode === 'global'" class="flex items-center gap-1.5 mt-1.5">
-               <span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
-               <span class="text-[10px] text-purple-600 dark:text-purple-400 font-bold uppercase tracking-tight">
-                  当前全局：{{ globalConfigLabel }}
-               </span>
-            </div>
           </div>
 
           <!-- 引擎为第三方时的 URL 输入 -->
@@ -241,7 +232,7 @@ watch(
           </div>
 
           <!-- 规则配置选择器 -->
-          <div v-if="localProfile.transformConfigMode !== 'global' && localProfile.transformConfigMode !== 'builtin'" class="sm:col-span-2 animate-fade-in-down border-t border-gray-50 dark:border-gray-700/50 pt-3">
+           <div v-if="localProfile.transformConfigMode !== 'builtin'" class="sm:col-span-2 animate-fade-in-down border-t border-gray-50 dark:border-gray-700/50 pt-3">
             <label class="block text-xs font-medium text-indigo-600 dark:text-indigo-400 mb-1.5">定制化规则模板 (Config Template URL)</label>
             <TransformSelector
               v-model="localProfile.transformConfig"
@@ -281,15 +272,11 @@ watch(
             <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">内置规则等级 (仅内置自动分流生效)</label>
             <select
               v-model="localProfile.ruleLevel"
-              :disabled="localProfile.transformConfigMode !== 'builtin' && localProfile.transformConfigMode !== 'global'"
-              :class="{ 'opacity-50 cursor-not-allowed': localProfile.transformConfigMode !== 'builtin' && localProfile.transformConfigMode !== 'global' }"
+               :disabled="localProfile.transformConfigMode !== 'builtin'"
+               :class="{ 'opacity-50 cursor-not-allowed': localProfile.transformConfigMode !== 'builtin' }"
               class="block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 misub-radius-md sm:text-sm dark:text-white transition-all"
             >
-              <option value="">跟随全局等级</option>
-              <option value="base">精简版 Base</option>
-              <option value="std">标准版 Standard</option>
-              <option value="full">完整版 Full</option>
-              <option value="relay">链式版 Relay</option>
+               <option value="base">精简版 Base</option>
             </select>
           </div>
 

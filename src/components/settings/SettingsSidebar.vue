@@ -10,11 +10,7 @@ const emit = defineEmits(['update:activeTab']);
 
 const tabs = [
   { id: 'basic', label: '基础设置' },
-  { id: 'home', label: '首页设置' },
-  { id: 'custom-page', label: '自定义公开页' },
-  { id: 'global', label: '全局设置' },
   { id: 'service', label: '服务集成' },
-  { id: 'client', label: '客户端管理' },
   { id: 'system', label: '系统设置' },
 ];
 </script>

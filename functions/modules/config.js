@@ -20,7 +20,8 @@ export const DEFAULT_SETTINGS = {
     profileToken: 'profiles',
     transformConfigMode: 'builtin',
     transformConfig: '',
-    ruleLevel: 'std',
+    externalTemplateEnabled: false,
+    ruleLevel: 'base',
     builtinSkipCertVerify: false,
     builtinEnableUdp: true,
     builtinLoonSkipCertVerify: false,
@@ -40,53 +41,6 @@ export const DEFAULT_SETTINGS = {
     enableEnhancedLogging: true,       // 启用增强日志
     maxSubscriptionConcurrency: 3,     // 最大订阅并发数
     defaultUserAgent: 'clash-meta/2.5.0', // 默认User-Agent
-    defaultPrefixSettings: {
-        enableManualNodes: true,
-        enableSubscriptions: true,
-        manualNodePrefix: '手动节点',
-        prependGroupName: false
-    },
-    defaultOperators: [], // 新版操作符链式处理 (New Unified Pipeline)
-    // @deprecated 使用 defaultOperators 代替
-    defaultNodeTransform: {
-        enabled: false,
-        filter: {
-            include: { enabled: false, rules: [] },
-            exclude: { enabled: false, rules: [] },
-            protocols: { enabled: false, values: [] },
-            regions: { enabled: false, values: [] },
-            script: { enabled: false, expression: '' },
-            useless: { enabled: false }
-        },
-        rename: {
-            regex: { enabled: false, rules: [] },
-            script: { enabled: false, expression: '' },
-            template: {
-                enabled: false,
-                template: '{emoji}{region}-{protocol}-{index}',
-                indexStart: 1,
-                indexPad: 2,
-                indexScope: 'regionProtocol',
-                regionAlias: {},
-                protocolAlias: { hysteria2: 'hy2' }
-            }
-        },
-        dedup: {
-            enabled: false,
-            mode: 'serverPort',
-            includeProtocol: false,
-            prefer: { protocolOrder: ['vless', 'trojan', 'vmess', 'hysteria2', 'ss', 'ssr'] }
-        },
-        sort: {
-            enabled: false,
-            nameIgnoreEmoji: true,
-            keys: [
-                { key: 'region', order: 'asc', customOrder: ['香港', '台湾', '日本', '新加坡', '美国', '韩国', '英国', '德国', '法国', '加拿大'] },
-                { key: 'protocol', order: 'asc', customOrder: ['vless', 'trojan', 'vmess', 'hysteria2', 'ss', 'ssr'] },
-                { key: 'name', order: 'asc' }
-            ]
-        }
-    },
     nodeTransformPresets: [],
     // 公告设置
     announcement: {

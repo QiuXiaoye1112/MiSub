@@ -186,9 +186,6 @@ export async function handleProfileMode(request, env, profileId, userAgent, appl
         if (!activeOperators.length && profile?.nodeTransform?.enabled && profile.nodeTransform?.operators) {
             activeOperators = ensureArray(profile.nodeTransform.operators);
         }
-        if (!activeOperators.length && settings?.defaultOperators) {
-            activeOperators = ensureArray(settings.defaultOperators);
-        }
         if (!activeOperators.length && effectiveNodeTransform?.enabled) {
             activeOperators = adaptLegacyTransform({
                 ...effectiveNodeTransform,

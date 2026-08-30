@@ -446,7 +446,7 @@ onUnmounted(() => {
                 </div>
 
                 <!-- Clients Section (Visually Separated) -->
-                <div class="mt-16 pt-12 pb-10 border-t border-transparent bg-transparent dark:bg-transparent backdrop-blur-sm">
+                 <div v-if="false" class="mt-16 pt-12 pb-10 border-t border-transparent bg-transparent dark:bg-transparent backdrop-blur-sm">
                     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div class="text-center mb-16 relative">
                             <div class="relative inline-flex flex-col items-center">

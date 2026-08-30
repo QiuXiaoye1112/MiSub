@@ -22,8 +22,8 @@ describe('Transform assets', () => {
         expect(asset?.id).toBe(TRANSFORM_ASSETS.configs[0].id);
     });
 
-    it('should include builtin lite preset', () => {
-        const asset = getTransformAssetByUrl('builtin:clash_acl4ssr_lite');
+    it('should include the minimal builtin preset', () => {
+        const asset = getTransformAssetByUrl('builtin:clash_misub_minimal');
         expect(asset?.sourceType).toBe('builtin-preset');
         expect(asset?.compatibleClients).toContain('surge');
     });

@@ -7,18 +7,13 @@ import SettingsLayout from '../components/layout/SettingsLayout.vue';
 
 import SettingsSidebar from '../components/settings/SettingsSidebar.vue';
 import BasicSettings from '../components/settings/sections/BasicSettings.vue';
-import HomeSettings from '../components/settings/sections/HomeSettings.vue';
 import ServiceSettings from '../components/settings/sections/ServiceSettings.vue';
-import GlobalSettings from '../components/settings/sections/GlobalSettings.vue';
 
 import SystemSettings from '../components/settings/sections/SystemSettings.vue';
-import ClientSettings from '../components/settings/sections/ClientSettings.vue';
-import CustomPageSettings from '../components/settings/sections/CustomPageSettings.vue';
 
 // 使用 composable 获取所有设置相关的状态和函数
 const {
   settings,
-  disguiseConfig,
   isLoading,
   isSaving,
   showMigrationModal,
@@ -39,13 +34,8 @@ const route = useRoute();
 const currentTabLabel = computed(() => {
   switch (activeTab.value) {
     case 'basic': return '基础设置';
-    case 'home': return '首页设置';
-    case 'global': return '全局设置';
     case 'service': return '服务集成';
-
-    case 'client': return '客户端管理';
     case 'system': return '系统设置';
-    case 'custom-page': return '自定义公开页';
     default: return '设置';
   }
 });
@@ -105,12 +95,8 @@ watch(() => route.path, (path) => {
             修改后记得点击右下角保存
           </div>
         </div>
-        <BasicSettings v-show="activeTab === 'basic'" :settings="settings" :disguiseConfig="disguiseConfig" />
-        <HomeSettings v-show="activeTab === 'home'" :settings="settings" />
-        <GlobalSettings v-show="activeTab === 'global'" :settings="settings" />
+        <BasicSettings v-show="activeTab === 'basic'" :settings="settings" />
         <ServiceSettings v-show="activeTab === 'service'" :settings="settings" />
-        <ClientSettings v-show="activeTab === 'client'" />
-        <CustomPageSettings v-show="activeTab === 'custom-page'" :settings="settings" />
         <SystemSettings v-show="activeTab === 'system'" :settings="settings" :exportBackup="exportBackup"
           :importBackup="importBackup" :handleReset="handleReset" @migrate="handleOpenMigrationModal" />
       </div>

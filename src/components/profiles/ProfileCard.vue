@@ -125,3 +125,9 @@ const isPublic = computed(() => props.profile?.isPublic === true);
     </div>
   </div>
 </template>
+
+<style scoped>
+button[title="查看日志"] {
+  display: none;
+}
+</style>

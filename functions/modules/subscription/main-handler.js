@@ -363,18 +363,16 @@ export async function handleMisubRequest(context) {
     const globalSub = config.subconverter || {};
     
     // [Optimization] Respect user defined engine mode while preventing loops for non-browser agents (backend fetchers)
-    const effectiveEngine = resolveEffectiveEngine({
-        searchParams: url.searchParams,
-        userAgent: userAgentHeader,
-        profileEngineMode: profileSub.engineMode,
-        globalEngineMode: globalSub.engineMode
-    });
-    const isExternalMode = effectiveEngine === 'external';
-    const useBuiltin = !isExternalMode;
+    // Service integration now uses the built-in renderer. An external URL is
+    // treated as a remote template, not as a third-party conversion backend.
+    const isExternalMode = false;
+    const useBuiltin = true;
     const { shouldSkipCertificateVerify, shouldEnableUdp } = resolveBuiltinEngineFlags(config, isExternalMode);
 
     
-    const globalTemplateUrl = resolveTemplateUrl(config.transformConfigMode, config.transformConfig, '');
+    const globalTemplateUrl = config.externalTemplateEnabled === true
+        ? resolveTemplateUrl('custom', config.transformConfig, '')
+        : '';
     const templateUrl = currentProfile
         ? resolveTemplateUrl(currentProfile.transformConfigMode, currentProfile.transformConfig, globalTemplateUrl)
         : globalTemplateUrl;
@@ -429,9 +427,12 @@ export async function handleMisubRequest(context) {
 
         // 设置优先级：订阅组设置 > 全局设置 > 内置默认值
         // prefixSettings 回退逻辑
-        const globalPrefixSettings = config.defaultPrefixSettings || {};
         const profilePrefixSettings = activeProfile?.prefixSettings || null;
-        const effectivePrefixSettings = { ...globalPrefixSettings };
+        const effectivePrefixSettings = {
+            enableManualNodes: true,
+            enableSubscriptions: true,
+            manualNodePrefix: '手动节点'
+        };
 
         if (profilePrefixSettings && typeof profilePrefixSettings === 'object') {
             if (profilePrefixSettings.enableManualNodes !== null && profilePrefixSettings.enableManualNodes !== undefined) {
@@ -446,7 +447,6 @@ export async function handleMisubRequest(context) {
         }
 
         // nodeTransform 回退逻辑
-        const globalNodeTransform = config.defaultNodeTransform || {};
         const globalNodeTransformPresets = Array.isArray(config.nodeTransformPresets) ? config.nodeTransformPresets : [];
         const profileNodeTransform = activeProfile?.nodeTransform ?? null;
         const profileNodeTransformPresetId = activeProfile?.nodeTransformPresetId || '';
@@ -460,7 +460,7 @@ export async function handleMisubRequest(context) {
         const effectiveNodeTransform = hasProfileNodeTransform
             ? profileNodeTransform
             : profilePresetNodeTransform
-            || globalNodeTransform;
+            || {};
 
         const generationSettings = {
             ...effectivePrefixSettings,
