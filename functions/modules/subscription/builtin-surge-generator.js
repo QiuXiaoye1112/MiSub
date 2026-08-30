@@ -454,7 +454,7 @@ dns-server = 119.29.29.29, 223.5.5.5, system`);
 
     sections.push(`[Proxy]\nDIRECT = direct\n${finalProxyLines.join('\n')}`);
 
-    const levelKey = (ruleLevel || 'std').toUpperCase();
+    const levelKey = 'BASE';
     const policyFactory = POLICY_GROUPS[levelKey] || POLICY_GROUPS.STD;
     
     // 构造带元数据的代理对象用于策略分组

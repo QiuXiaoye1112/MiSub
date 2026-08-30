@@ -283,7 +283,7 @@ export function generateBuiltinSingboxConfig(nodeList, options = {}) {
         outbounds.push({ tag: 'DIRECT', type: 'direct' });
     }
 
-    const levelKey = (ruleLevel || 'std').toUpperCase();
+    const levelKey = 'BASE';
     // 获取内置策略组
     const policyGroupsFactory = POLICY_GROUPS[levelKey] || POLICY_GROUPS.STD;
     let proxyGroups = policyGroupsFactory(outbounds);

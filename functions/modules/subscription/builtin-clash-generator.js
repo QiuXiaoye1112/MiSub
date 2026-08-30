@@ -167,7 +167,7 @@ export function generateBuiltinClashConfig(nodeList, options = {}) {
 
     // 生成 YAML
     try {
-        const levelKey = (ruleLevel || 'std').toUpperCase();
+        const levelKey = 'BASE';
         const rawRules = isHiddifyClient
             ? ['MATCH,🚀 节点选择']
             : getBuiltinRules(levelKey, 'clash');
@@ -241,7 +241,7 @@ export function generateBuiltinClashConfig(nodeList, options = {}) {
         console.error('[BuiltinClash] Generation failed:', e);
         // Fallback: 至少返回包含节点的有效 YAML 结构，而不是传回会导致 Clash 报错的 Base64
         const fallbackProxies = Array.isArray(proxies) ? stripInternalProxyFields(proxies) : [];
-        const selectGroup = (ruleLevel || '').toUpperCase() === 'RELAY' ? DEFAULT_RELAY_GROUP : DEFAULT_SELECT_GROUP;
+        const selectGroup = DEFAULT_SELECT_GROUP;
         const fallbackYaml = `proxies:\n${fallbackProxies.map(p => `  - ${JSON.stringify(p)}`).join('\n')}\n` +
                              `proxy-groups:\n  - name: ${selectGroup}\n    type: select\n    proxies: ${JSON.stringify(fallbackProxies.map(p => p.name))}\n` +
                              `rules:\n  - MATCH,${selectGroup}\n`;

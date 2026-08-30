@@ -323,7 +323,7 @@ resource-parser = https://raw.githubusercontent.com/sub-store-org/Sub-Store/mast
 
     sections.push(`[Proxy]\nDIRECT = direct\n${proxyLines.join('\n')}`);
 
-    const levelKey = (ruleLevel || 'std').toUpperCase();
+    const levelKey = 'BASE';
     const policyFactory = POLICY_GROUPS[levelKey] || POLICY_GROUPS.STD;
     let abstractGroups = policyFactory(proxiesWithMetadata);
     if (levelKey === 'RELAY') {

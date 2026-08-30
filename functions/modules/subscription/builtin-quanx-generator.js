@@ -266,7 +266,7 @@ export function generateBuiltinQuanxConfig(nodeList, options = {}) {
     sections.push(`[server_remote]`);
     sections.push(`[server_local]\n${proxyLines.join('\n')}`);
 
-    const levelKey = (ruleLevel || 'std').toUpperCase();
+    const levelKey = 'BASE';
     const policyFactory = POLICY_GROUPS[levelKey] || POLICY_GROUPS.STD;
     let abstractGroups = policyFactory(proxiesWithMetadata);
     abstractGroups = pruneProxyGroups(abstractGroups, proxiesWithMetadata);
