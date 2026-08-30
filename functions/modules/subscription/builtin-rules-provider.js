@@ -3,7 +3,7 @@ import { groupNodeLinesByRegion } from './region-groups.js';
 /**
  * 策略组标准名称常量
  */
-export const DEFAULT_SELECT_GROUP = '🚀 节点选择';
+export const DEFAULT_SELECT_GROUP = '节点选择';
 export const DEFAULT_RELAY_GROUP = '🌍 总出口';
 export const AUTO_SELECT_GROUP = '♻️ 自动选择';
 export const FALLBACK_GROUP = '🔯 故障转移';

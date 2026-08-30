@@ -52,7 +52,7 @@ export function buildTransformTemplateContext({ proxies = '', rules = '', fileNa
     const normalizedProtocolGroups = Array.isArray(protocolGroups) ? protocolGroups : [];
     const regionNames = normalizedRegionGroups.map(group => group.name).filter(Boolean);
     const protocolNames = normalizedProtocolGroups.map(group => group.name).filter(Boolean);
-    const primaryStrategyChain = ['🚀 节点选择', '♻️ 自动选择', ...regionNames, ...protocolNames, '☑️ 手动切换', 'DIRECT'].join(', ');
+    const primaryStrategyChain = ['节点选择', ...regionNames, ...protocolNames, 'DIRECT'].join(', ');
     return {
         proxies,
         rules,
@@ -72,6 +72,6 @@ export function buildTransformTemplateContext({ proxies = '', rules = '', fileNa
         primaryStrategyChain,
         regionStrategyChain: regionNames.join(', '),
         protocolStrategyChain: protocolNames.join(', '),
-        allStrategyGroups: [...new Set(['🚀 节点选择', '♻️ 自动选择', ...regionNames, ...protocolNames, '☑️ 手动切换', 'DIRECT'])].join(', ')
+        allStrategyGroups: [...new Set(['节点选择', ...regionNames, ...protocolNames, 'DIRECT'])].join(', ')
     };
 }
