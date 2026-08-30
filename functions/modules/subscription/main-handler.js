@@ -431,7 +431,7 @@ export async function handleMisubRequest(context) {
         const effectivePrefixSettings = {
             enableManualNodes: true,
             enableSubscriptions: true,
-            manualNodePrefix: '手动节点'
+            manualNodePrefix: ''
         };
 
         if (profilePrefixSettings && typeof profilePrefixSettings === 'object') {

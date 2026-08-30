@@ -85,7 +85,7 @@ export const DEFAULT_PROFILE_FORM = {
     prefixSettings: {
         enableManualNodes: true,
         enableSubscriptions: true,
-        manualNodePrefix: '手动节点',
+        manualNodePrefix: '',
         subscriptionPrefix: '',
         prependGroupName: null
     },
