@@ -53,6 +53,11 @@ const isPublicRoute = computed(() => route.meta.isPublic);
 const isSessionLoading = computed(() => sessionState.value === 'loading');
 
 const showModernNavBar = computed(() => isLoggedIn.value && layoutMode.value === 'modern');
+const shouldHidePublicBranding = computed(() => {
+  if (isLoggedIn.value || !isPublicRoute.value) return false;
+  return sessionStore.publicConfig?.customPage?.enabled === true
+    && sessionStore.publicConfig?.customPage?.hideBranding === true;
+});
 const shouldHidePublicHeader = computed(() => {
   if (isLoggedIn.value || !isPublicRoute.value) return false;
   return sessionStore.publicConfig?.customPage?.enabled === true && sessionStore.publicConfig?.customPage?.hideHeader === true;
