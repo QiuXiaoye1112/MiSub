@@ -23,7 +23,6 @@ import Switch from '../ui/Switch.vue';
 const subscriptionCount = computed(() => Array.isArray(props.profile?.subscriptions) ? props.profile.subscriptions.length : 0);
 const manualNodeCount = computed(() => Array.isArray(props.profile?.manualNodes) ? props.profile.manualNodes.length : 0);
 const isEnabled = computed(() => props.profile?.enabled !== false);
-const isPublic = computed(() => props.profile?.isPublic === true);
 
 </script>
 
@@ -40,9 +39,6 @@ const isPublic = computed(() => props.profile?.isPublic === true);
           </span>
           <span v-if="!isEnabled" class="rounded-full bg-gray-200 px-2.5 py-0.5 text-[11px] font-medium text-gray-600 dark:bg-white/10 dark:text-gray-400">
             已停用
-          </span>
-          <span v-else-if="isPublic" class="rounded-full bg-emerald-100 px-2.5 py-0.5 text-[11px] font-medium text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">
-            已公开
           </span>
         </div>
         <p class="truncate text-lg font-semibold text-gray-900 dark:text-white" :title="profile.name">
@@ -80,14 +76,6 @@ const isPublic = computed(() => props.profile?.isPublic === true);
           :model-value="isEnabled"
           @update:model-value="(val) => $emit('change', { ...profile, enabled: val })"
           label="启用"
-        />
-      </div>
-      <div class="flex items-center justify-between gap-3 text-gray-600 dark:text-gray-300">
-        <span>公开访问</span>
-        <Switch 
-          :model-value="isPublic"
-          @update:model-value="(val) => $emit('change', { ...profile, isPublic: val })"
-          label="公开"
         />
       </div>
       <div class="flex items-center justify-between gap-3 text-xs text-gray-500 dark:text-gray-400">
