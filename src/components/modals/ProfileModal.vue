@@ -310,7 +310,7 @@ const updateSelectedIds = (listName, newIds) => {
       </div>
     </template>
     <template #body>
-      <div v-if="localProfile" class="space-y-6">
+      <div v-if="localProfile" class="space-y-4">
         <ProfileForm 
           :local-profile="localProfile" 
           :show-advanced="showAdvanced" 
@@ -321,7 +321,7 @@ const updateSelectedIds = (listName, newIds) => {
           @toggle-advanced="showAdvanced = !showAdvanced" 
         />
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 items-start gap-4 md:grid-cols-2">
 
           <SubscriptionSelector :subscriptions="allSubscriptions" :filtered-subscriptions="filteredSubscriptions"
             :search-term="subscriptionSearchTerm" :selected-ids="localProfile.subscriptions || []"

@@ -125,11 +125,11 @@ watch(
   </div>
 
   <!-- Advanced Settings Toggle -->
-  <div class="border-t border-gray-200 dark:border-gray-700 pt-4 mt-6">
+  <div class="overflow-hidden rounded-xl border border-gray-200 bg-gray-50/60 dark:border-white/10 dark:bg-white/[0.02]">
     <button 
       type="button" 
       @click="emit('toggle-advanced')"
-      class="flex items-center text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 focus:outline-hidden"
+       :aria-expanded="showAdvanced" class="flex w-full items-center justify-between px-4 py-3 text-sm font-medium text-indigo-600 transition-colors hover:bg-indigo-50 dark:text-indigo-300 dark:hover:bg-white/5 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-indigo-500"
     >
       <span>核心配置与高级设置</span>
       <svg :class="{ 'rotate-180': showAdvanced }" class="w-4 h-4 ml-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -137,7 +137,7 @@ watch(
       </svg>
     </button>
     
-    <div v-show="showAdvanced" class="mt-4 space-y-8 animate-fade-in-down">
+    <div v-show="showAdvanced" class="space-y-6 border-t border-gray-200 px-4 py-4 dark:border-white/10">
       <!-- === 区块 A：渲染核心配置 (Core Logic) === -->
       <div class="space-y-4">
         <div class="flex items-center gap-2 border-l-4 border-indigo-500 pl-3">

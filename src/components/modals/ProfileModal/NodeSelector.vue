@@ -59,44 +59,39 @@ const orderedSelectedNodes = computed({
 </script>
 
 <template>
-  <div v-if="nodes.length > 0" class="space-y-2">
-    <div class="flex justify-between items-center mb-2">
-      <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">选择手动节点</h4>
-      <div class="space-x-2">
+  <section class="min-w-0 rounded-xl border border-gray-200 bg-white/70 p-4 dark:border-white/10 dark:bg-white/[0.02]">
+    <div class="mb-3 flex min-h-7 flex-wrap items-center justify-between gap-2">
+      <div class="flex flex-wrap items-center gap-2"><h4 class="text-sm font-semibold text-gray-800 dark:text-gray-200">手动节点</h4><span class="rounded-full bg-indigo-50 px-2 py-0.5 text-xs text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-300">已选 {{ selectedIds.length }} / {{ nodes.length }}</span></div>
+      <div class="flex shrink-0 items-center gap-3">
         <button @click="emit('select-all')" class="text-xs text-indigo-600 hover:underline">全选</button>
         <button @click="emit('deselect-all')" class="text-xs text-indigo-600 hover:underline">全不选</button>
       </div>
     </div>
-    <!-- Group Filter -->
-    <div
-      class="flex items-center gap-2 mb-2 p-1.5 misub-radius-md border-b border-gray-100 dark:border-gray-700/50 overflow-x-auto no-scrollbar mask-gradient-r">
-      <button @click="emit('update:groupFilter', null)"
-        class="px-2.5 py-1 text-xs font-medium rounded-full transition-all border shrink-0 whitespace-nowrap"
-        :class="!activeGroupFilter ? 'bg-indigo-100 text-indigo-700 border-indigo-200 dark:bg-indigo-900 dark:text-indigo-300 dark:border-indigo-700' : 'bg-white text-gray-600 border-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600'">全部</button>
-      <button @click="emit('update:groupFilter', '默认')"
-        class="px-2.5 py-1 text-xs font-medium rounded-full transition-all border shrink-0 whitespace-nowrap"
-        :class="activeGroupFilter === '默认' ? 'bg-indigo-100 text-indigo-700 border-indigo-200 dark:bg-indigo-900 dark:text-indigo-300 dark:border-indigo-700' : 'bg-white text-gray-600 border-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600'">未分组</button>
-      <button v-for="group in groups" :key="group"
-        @click="emit('update:groupFilter', activeGroupFilter === group ? null : group)"
-        class="px-2.5 py-1 text-xs font-medium rounded-full transition-all border shrink-0 whitespace-nowrap"
-        :class="activeGroupFilter === group ? 'bg-indigo-100 text-indigo-700 border-indigo-200 dark:bg-indigo-900 dark:text-indigo-300 dark:border-indigo-700' : 'bg-white text-gray-600 border-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600'">
-        {{ group }}
-      </button>
-    </div>
-
-    <div class="relative mb-2">
+    <div class="mb-3 flex items-center gap-2">
+    <div class="relative min-w-0 flex-1">
       <input type="text" v-model="searchModel" placeholder="搜索节点..."
-        class="w-full pl-9 pr-3 py-1.5 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 misub-radius-md shadow-xs focus:outline-hidden focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500" />
+        class="h-10 w-full pl-9 pr-3 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 misub-radius-md shadow-xs focus:outline-hidden focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500" />
       <svg class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg"
         fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
           d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
       </svg>
     </div>
+      <select
+        aria-label="筛选手动节点分组"
+        :value="activeGroupFilter ?? ''"
+        @change="emit('update:groupFilter', $event.target.value || null)"
+        class="h-10 min-w-0 max-w-[45%] rounded-lg border border-gray-300 bg-white px-2 text-sm text-gray-700 focus:border-indigo-500 focus:outline-hidden focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200"
+      >
+        <option value="">全部分组</option>
+        <option value="默认">未分组</option>
+        <option v-for="group in groups" :key="group" :value="group">{{ group }}</option>
+      </select>
+    </div>
     <div
-      class="overflow-y-auto space-y-2 p-3 bg-gray-50 dark:bg-gray-900/50 misub-radius-md border dark:border-gray-700 h-36 lg:h-64">
+      class="overflow-y-auto space-y-2 p-3 bg-gray-50 dark:bg-gray-900/50 misub-radius-md border dark:border-gray-700 h-48 lg:h-56">
       <div v-for="node in filteredNodes" :key="node.id">
-        <label class="flex items-center space-x-3 cursor-pointer">
+        <label class="flex min-h-9 items-center gap-3 rounded-lg px-2 py-1.5 cursor-pointer hover:bg-indigo-50 dark:hover:bg-white/5">
           <input type="checkbox" :checked="selectedIds.includes(node.id)" @change="emit('toggle-selection', node.id)"
             class="h-4 w-4 rounded-sm border-gray-300 text-indigo-600 focus:ring-indigo-500" />
           <span class="text-sm text-gray-800 dark:text-gray-200 truncate" :title="node.name">{{ node.name || '未命名节点'
@@ -104,7 +99,7 @@ const orderedSelectedNodes = computed({
         </label>
       </div>
       <div v-if="filteredNodes.length === 0" class="text-center text-gray-500 text-sm py-4">
-        没有找到匹配的节点。
+        {{ nodes.length ? '没有找到匹配的节点' : '暂无可用的手动节点' }}
       </div>
     </div>
 
@@ -116,7 +111,7 @@ const orderedSelectedNodes = computed({
         </h5>
       </div>
       <draggable v-model="orderedSelectedNodes" item-key="id" handle=".drag-handle" ghost-class="opacity-40"
-        class="space-y-1 p-2 bg-indigo-50 dark:bg-indigo-900/20 misub-radius-md border border-indigo-200 dark:border-indigo-800 h-32 lg:h-48 overflow-y-auto">
+        class="space-y-1 p-2 bg-indigo-50 dark:bg-indigo-900/20 misub-radius-md border border-indigo-200 dark:border-indigo-800 max-h-40 overflow-y-auto">
         <template #item="{ element, index }">
           <div
             class="flex items-center gap-2 px-2 py-1.5 bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700 shadow-xs">
@@ -140,9 +135,5 @@ const orderedSelectedNodes = computed({
         </template>
       </draggable>
     </div>
-  </div>
-  <div v-else
-    class="text-center text-sm text-gray-500 p-4 bg-gray-50 dark:bg-gray-900/50 misub-radius-md flex items-center justify-center h-full">
-    没有可用的手动节点
-  </div>
+  </section>
 </template>
