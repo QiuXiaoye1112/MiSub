@@ -40,20 +40,6 @@ const toggleProfileSorting = () => {
   isProfileSorting.value = !isProfileSorting.value;
 };
 
-const NodePreviewModal = defineAsyncComponent(() => import('../components/modals/NodePreview/NodePreviewModal.vue'));
-const showNodePreviewModal = ref(false);
-const previewProfileId = ref(null);
-const previewProfileName = ref('');
-
-const handlePreviewProfile = (profileId) => {
-  const profile = profiles.value.find(p => p.id === profileId || p.customId === profileId);
-  if (profile) {
-    previewProfileId.value = profileId;
-    previewProfileName.value = profile.name;
-    showNodePreviewModal.value = true;
-  }
-};
-
 const ProfileModal = defineAsyncComponent(() => import('../components/modals/ProfileModal.vue'));
 const LogModal = defineAsyncComponent(() => import('../components/modals/LogModal.vue'));
 const CopyLinkModal = defineAsyncComponent(() => import('../components/modals/CopyLinkModal.vue'));
@@ -112,7 +98,7 @@ const handleQRCode = (profileId) => {
     <ProfilePanel :profiles="profiles" :paginated-profiles="paginatedProfiles" :current-page="profilesCurrentPage"
       :total-pages="profilesTotalPages" :is-sorting="isProfileSorting" @add="handleAddProfile" @edit="handleEditProfile" @delete="handleDeleteProfile"
       @deleteAll="showDeleteProfilesModal = true" @toggle="handleProfileToggle" @openCopy="handleOpenCopy"
-      @preview="handlePreviewProfile" @reorder="handleProfileReorder" @toggle-sort="toggleProfileSorting"
+      @reorder="handleProfileReorder" @toggle-sort="toggleProfileSorting"
       @change-page="changeProfilesPage" @viewLogs="handleViewLogs" @qrcode="handleQRCode" />
 
     <LogModal :show="showLogModal" @update:show="showLogModal = $event" :filter-profile-name="logProfileName" />
@@ -129,10 +115,6 @@ const handleQRCode = (profileId) => {
         <p class="text-sm text-gray-400">您确定要删除所有**订阅组**吗？此操作不可逆。</p>
       </template>
     </Modal>
-
-    <NodePreviewModal :show="showNodePreviewModal" :subscription-id="null" :subscription-name="''"
-      :subscription-url="''" :profile-id="previewProfileId" :profile-name="previewProfileName"
-      @update:show="showNodePreviewModal = $event" />
 
     <QRCodeModal v-model:show="showQRCodeModal" :url="qrCodeUrl" :title="qrCodeTitle" />
     

@@ -9,7 +9,6 @@ import { parseCustomPageSource } from '../utils/custom-page-source.js';
 
 const isDev = import.meta.env.DEV;
 
-const NodePreviewModal = defineAsyncComponent(() => import('../components/modals/NodePreview/NodePreviewModal.vue'));
 const AnnouncementCard = defineAsyncComponent(() => import('../components/features/AnnouncementCard.vue'));
 const GuestbookModal = defineAsyncComponent(() => import('../components/modals/GuestbookModal.vue'));
 const QuickImportModal = defineAsyncComponent(() => import('../components/modals/QuickImportModal.vue'));
@@ -182,16 +181,6 @@ const getClientVersionLabel = (client) => {
     return '稳定版';
 };
 
-const showPreviewModal = ref(false);
-const previewProfileId = ref(null);
-const previewProfileName = ref('');
-
-const handlePreview = (profile) => {
-    previewProfileId.value = profile.id; 
-    previewProfileName.value = profile.name;
-    showPreviewModal.value = true;
-};
-
 const handleQuickImport = (profile) => {
     selectedProfileForImport.value = profile;
     showQuickImportModal.value = true;
@@ -350,7 +339,7 @@ onUnmounted(() => {
                 <div v-else-if="error">{{ error }}</div>
                 <ProfileGrid v-else-if="publicProfiles.length > 0" :profiles="publicProfiles" :is-qr-expanded="isQRExpanded"
                     :profile-token="config.profileToken || 'profiles'" @quick-import="handleQuickImport"
-                    @toggle-qr="toggleQRCode" @preview="handlePreview" @copy-link="copyLink" @download-qr="downloadQRCode"
+                    @toggle-qr="toggleQRCode" @copy-link="copyLink" @download-qr="downloadQRCode"
                     @register-canvas="registerQrCanvas" />
             </template>
 
@@ -440,7 +429,7 @@ onUnmounted(() => {
                     <div v-else-if="publicProfiles.length > 0" class="animate-fade-in-up delay-300">
                         <ProfileGrid :profiles="publicProfiles" :is-qr-expanded="isQRExpanded"
                             :profile-token="config.profileToken || 'profiles'" @quick-import="handleQuickImport"
-                            @toggle-qr="toggleQRCode" @preview="handlePreview" @copy-link="copyLink" @download-qr="downloadQRCode"
+                            @toggle-qr="toggleQRCode" @copy-link="copyLink" @download-qr="downloadQRCode"
                             @register-canvas="registerQrCanvas" />
                     </div>
                 </div>
@@ -515,8 +504,6 @@ onUnmounted(() => {
         </template>
 
         <!-- Modals -->
-        <NodePreviewModal v-if="showPreviewModal" :show="showPreviewModal" @update:show="showPreviewModal = $event"
-            :profile-id="previewProfileId" :profile-name="previewProfileName" api-endpoint="/api/public/preview" />
 
         <GuestbookModal :show="showGuestbookModal" :config="guestbookConfig" @close="showGuestbookModal = false" />
 

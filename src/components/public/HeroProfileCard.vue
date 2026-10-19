@@ -15,7 +15,6 @@ const props = defineProps({
 
 const emit = defineEmits([
     'quick-import',
-    'preview',
     'copy-link',
     'toggle-qr',
     'download-qr',
@@ -24,7 +23,6 @@ const emit = defineEmits([
 
 const ICONS = {
     import: 'M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4',
-    preview: 'M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z',
     link: 'M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1',
     qr: 'M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z'
 };
@@ -61,7 +59,7 @@ const ICONS = {
                 <!-- 2. Description Column (Middle) -->
                 <div class="flex-1 border-t lg:border-t-0 lg:border-l border-gray-100 dark:border-white/5 pt-6 lg:pt-0 lg:pl-12 w-full lg:w-auto text-center lg:text-left">
                     <p class="text-gray-600 dark:text-gray-400 text-base leading-relaxed max-w-2xl mx-auto lg:mx-0">
-                        {{ profile.description || '该订阅组由管理员维护，可用于快速预览节点并一键导入到客户端。' }}
+                        {{ profile.description || '该订阅组由管理员维护，可一键导入到客户端。' }}
                     </p>
                 </div>
 
@@ -73,12 +71,7 @@ const ICONS = {
                         一键导入
                     </button>
                     
-                    <div class="grid grid-cols-2 gap-3">
-                        <button @click="emit('preview', profile)"
-                            class="flex items-center justify-center rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-white/10 dark:bg-white/5 dark:text-gray-200 dark:hover:bg-white/10">
-                            <BaseIcon :path="ICONS.preview" className="w-4 h-4 mr-1" />
-                            预览
-                        </button>
+                    <div class="grid grid-cols-1 gap-3">
                          <button @click="emit('copy-link', profile)"
                             class="flex items-center justify-center rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-white/10 dark:bg-white/5 dark:text-gray-200 dark:hover:bg-white/10">
                             <BaseIcon :path="ICONS.link" className="w-4 h-4 mr-1" />

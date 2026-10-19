@@ -21,7 +21,6 @@ const props = defineProps({
 const emit = defineEmits([
   'quick-import',
   'toggle-qr',
-  'preview',
   'copy-link',
   'download-qr',
   'register-canvas'
@@ -45,15 +44,14 @@ const gridClass = computed(() => {
     <!-- 移动端：使用原卡片布局 -->
     <div class="block md:hidden max-w-md mx-auto">
       <ProfileCard :profile="profiles[0]" :is-qr-expanded="isQrExpanded(profiles[0].id)"
-        @quick-import="emit('quick-import', profiles[0])" @toggle-qr="emit('toggle-qr', profiles[0])"
-        @preview="emit('preview', profiles[0])" @copy-link="emit('copy-link', profiles[0])"
+        @quick-import="emit('quick-import', profiles[0])" @toggle-qr="emit('toggle-qr', profiles[0])" @copy-link="emit('copy-link', profiles[0])"
         @download-qr="emit('download-qr', profiles[0])"
         @register-canvas="(id, el) => emit('register-canvas', id, el)" />
     </div>
     <!-- 桌面端：使用 Hero 样式 -->
     <div class="hidden md:block w-full">
       <HeroProfileCard :profile="profiles[0]" :is-qr-expanded="isQrExpanded(profiles[0].id)"
-        @quick-import="emit('quick-import', profiles[0])" @toggle-qr="emit('toggle-qr', profiles[0])" @preview="emit('preview', profiles[0])"
+        @quick-import="emit('quick-import', profiles[0])" @toggle-qr="emit('toggle-qr', profiles[0])"
         @copy-link="emit('copy-link', profiles[0])" @download-qr="emit('download-qr', profiles[0])"
         @register-canvas="(id, el) => emit('register-canvas', id, el)" />
     </div>
@@ -63,7 +61,7 @@ const gridClass = computed(() => {
   <div v-else :class="gridClass">
     <ProfileCard v-for="profile in profiles" :key="profile.id" :profile="profile"
       :is-qr-expanded="isQrExpanded(profile.id)" @quick-import="emit('quick-import', profile)"
-      @toggle-qr="emit('toggle-qr', profile)" @preview="emit('preview', profile)"
+      @toggle-qr="emit('toggle-qr', profile)"
       @copy-link="emit('copy-link', profile)" @download-qr="emit('download-qr', profile)"
       @register-canvas="(id, el) => emit('register-canvas', id, el)" />
   </div>

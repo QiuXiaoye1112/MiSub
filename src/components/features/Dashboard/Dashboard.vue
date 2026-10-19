@@ -62,6 +62,7 @@ const markDirty = () => {
 // --- UI State ---
 const isSortingSubs = ref(false);
 const isSortingNodes = ref(false);
+const isSortingProfiles = ref(false);
 const manualNodeViewMode = ref('card');
 const showQRCodeModal = ref(false);
 const qrCodeUrl = ref('');
@@ -175,10 +176,8 @@ const batchGroupIds = ref([]); // Added
 // 节点预览相关状态
 const showNodePreviewModal = ref(false);
 const previewSubscriptionId = ref(null);
-const previewProfileId = ref(null);
 const previewSubscriptionName = ref('');
 const previewSubscriptionUrl = ref('');
-const previewProfileName = ref('');
 
 
 
@@ -329,23 +328,10 @@ const handlePreviewSubscription = (subscriptionId) => {
     previewSubscriptionId.value = subscriptionId;
     previewSubscriptionName.value = subscription.name || '未命名订阅';
     previewSubscriptionUrl.value = subscription.url;
-    previewProfileId.value = null;
-    previewProfileName.value = '';
     showNodePreviewModal.value = true;
   }
 };
 
-const handlePreviewProfile = (profileId) => {
-  const profile = profiles.value.find(p => p.id === profileId || p.customId === profileId);
-  if (profile) {
-    previewProfileId.value = profileId;
-    previewProfileName.value = profile.name;
-    previewSubscriptionId.value = null;
-    previewSubscriptionName.value = '';
-    previewSubscriptionUrl.value = '';
-    showNodePreviewModal.value = true;
-  }
-};
 
 const handleViewLogs = (profileId) => {
   const profile = profiles.value.find(p => p.id === profileId || p.customId === profileId);
@@ -429,9 +415,10 @@ import SavePrompt from '../../ui/SavePrompt.vue';
       <!-- Right Column -->
       <div class="space-y-6 lg:space-y-7 xl:col-span-1">
         <RightPanel :config="config" :profiles="profiles" :compact="true" @qrcode="(url, title) => { qrCodeUrl = url; qrCodeTitle = title; showQRCodeModal = true; }" />
-        <ProfilePanel :profiles="profiles" :compact="true" @add="handleAddProfile" @edit="handleEditProfile"
+        <ProfilePanel :profiles="profiles" :compact="true" :is-sorting="isSortingProfiles"
+          @toggle-sort="isSortingProfiles = !isSortingProfiles" @add="handleAddProfile" @edit="handleEditProfile"
           @delete="handleDeleteProfile" @deleteAll="showDeleteProfilesModal = true" @toggle="handleProfileToggle"
-          @open-copy="handleOpenCopy" @copyLink="copyProfileLink" @copyClashLink="copyClashLink" @preview="handlePreviewProfile" @viewLogs="handleViewLogs" @reorder="handleProfileReorder" 
+          @open-copy="handleOpenCopy" @copyLink="copyProfileLink" @copyClashLink="copyClashLink" @viewLogs="handleViewLogs" @reorder="handleProfileReorder"
           @qrcode="(id) => handleQRCode(id, 'profile')" />
       </div>
     </div>
@@ -485,7 +472,7 @@ import SavePrompt from '../../ui/SavePrompt.vue';
   <!-- 节点预览模态窗口 -->
   <NodePreviewModal :show="showNodePreviewModal" :subscription-id="previewSubscriptionId"
     :subscription-name="previewSubscriptionName" :subscription-url="previewSubscriptionUrl"
-    :profile-id="previewProfileId" :profile-name="previewProfileName" @update:show="showNodePreviewModal = $event" />
+    @update:show="showNodePreviewModal = $event" />
 
   <QRCodeModal 
     v-model:show="showQRCodeModal" 

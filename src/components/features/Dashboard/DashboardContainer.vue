@@ -79,7 +79,6 @@ const showSubscriptionImportModal = ref(false);
 // Node preview state
 const showNodePreviewModal = ref(false);
 const previewSubscriptionId = ref(null);
-const previewProfileId = ref(null);
 
 // Initialize state
 const initializeState = () => {
@@ -130,15 +129,9 @@ const handleSave = async () => {
 // Event handlers
 const handlePreviewSubscription = (subscription) => {
   previewSubscriptionId.value = subscription.id;
-  previewProfileId.value = null;
   showNodePreviewModal.value = true;
 };
 
-const handlePreviewProfile = (profile) => {
-  previewSubscriptionId.value = null;
-  previewProfileId.value = profile.customId || profile.id;
-  showNodePreviewModal.value = true;
-};
 
 const handleBulkImport = (importedSubscriptions) => {
   addSubscriptionsFromBulk(importedSubscriptions);
@@ -203,7 +196,7 @@ onUnmounted(() => {
         <div class="lg:col-span-1">
           <ProfileManager :config="config" :profiles="profiles" @add="handleAddProfile" @edit="handleEditProfile"
             @delete="handleDeleteProfile" @delete-all="showDeleteProfilesModal = true" @toggle="handleProfileToggle"
-            @copy-link="copyProfileLink" @preview="handlePreviewProfile" />
+            @copy-link="copyProfileLink" />
         </div>
       </div>
     </div>
@@ -252,6 +245,6 @@ onUnmounted(() => {
       @import="addNodesFromBulk" />
 
     <NodePreviewModal v-if="showNodePreviewModal" v-model:show="showNodePreviewModal"
-      :subscription-id="previewSubscriptionId" :profile-id="previewProfileId" />
+      :subscription-id="previewSubscriptionId" />
   </div>
 </template>

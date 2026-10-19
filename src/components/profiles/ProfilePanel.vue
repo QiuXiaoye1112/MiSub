@@ -23,7 +23,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['add', 'edit', 'delete', 'deleteAll', 'toggle', 'openCopy', 'preview', 'reorder', 'changePage', 'viewLogs', 'qrcode', 'toggle-sort']);
+const emit = defineEmits(['add', 'edit', 'delete', 'deleteAll', 'toggle', 'openCopy', 'reorder', 'changePage', 'viewLogs', 'qrcode', 'toggle-sort']);
 
 const displayProfiles = computed(() => {
   if (props.isSorting) {
@@ -44,7 +44,6 @@ const handleEdit = (profileId) => emit('edit', profileId);
 const handleDelete = (profileId) => emit('delete', profileId);
 const handleToggle = (event) => emit('toggle', event);
 const handleOpenCopy = (profileId) => emit('openCopy', profileId);
-const handlePreview = (profileId) => emit('preview', profileId);
 const handleAdd = () => emit('add');
 const handleChangePage = (page) => emit('changePage', page);
 const handleDeleteAll = () => emit('deleteAll');
@@ -80,12 +79,14 @@ const handleMoveDown = (profileId) => {
           </div>
           <div class="flex items-center gap-2 sm:w-auto justify-end sm:justify-start">
             <button @click="handleAdd" class="shrink-0 rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-700">新增</button>
+            <button
+              v-if="profiles.length > 1 || isSorting"
+              @click="handleToggleSort"
+              :aria-pressed="isSorting"
+              class="shrink-0 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-white/10 dark:bg-white/5 dark:text-gray-200 dark:hover:bg-white/10"
+            >{{ isSorting ? '完成排序' : '手动排序' }}</button>
             <MoreActionsMenu :teleport-to-body="true" menu-width-class="w-36">
               <template #menu="{ close }">
-                <button @click="handleToggleSort(); close()" class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
-                  {{ isSorting ? '完成排序' : '手动排序' }}
-                </button>
-                <div class="border-t border-gray-200 dark:border-gray-700 my-1"></div>
                 <button @click="handleDeleteAll(); close()" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-500/10">清空</button>
               </template>
             </MoreActionsMenu>
@@ -95,7 +96,7 @@ const handleMoveDown = (profileId) => {
     </div>
     <div v-if="profiles.length > 0">
       <div v-if="isSorting" class="mb-4 rounded-xl border border-indigo-200/70 bg-indigo-50/80 px-4 py-3 text-sm text-indigo-700 dark:border-indigo-500/30 dark:bg-indigo-500/10 dark:text-indigo-300">
-        当前为排序模式，已显示全部订阅组。使用卡片右下角的上下箭头调整顺序，完成后点击“完成排序”。
+        当前为排序模式，已显示全部订阅组。使用卡片右下角的上下箭头调整顺序，完成后点击“完成排序”，再点击“立即保存”保存。
       </div>
       <div class="grid gap-4" :class="compact ? 'grid-cols-1' : (displayProfiles.length > 1 ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1')">
         <div 
@@ -107,11 +108,12 @@ const handleMoveDown = (profileId) => {
           <ProfileCard
             :profile="profile"
             :is-sorting="isSorting"
+            :can-move-up="index > 0"
+            :can-move-down="index < displayProfiles.length - 1"
             :compact="compact"
             @edit="handleEdit(profile.id)"
             @delete="handleDelete(profile.id)"
             @change="handleToggle($event)"
-            @preview="handlePreview(profile.id)"
             @qrcode="handleQRCode(profile.id)"
             @move-up="handleMoveUp(profile.id)"
             @move-down="handleMoveDown(profile.id)"

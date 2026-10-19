@@ -10,13 +10,15 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  canMoveUp: { type: Boolean, default: true },
+  canMoveDown: { type: Boolean, default: true },
   compact: {
     type: Boolean,
     default: false,
   }
 });
 
-const emit = defineEmits(['delete', 'change', 'edit', 'open-copy', 'preview', 'move-up', 'move-down', 'view-logs', 'qrcode']);
+const emit = defineEmits(['delete', 'change', 'edit', 'open-copy', 'move-up', 'move-down', 'view-logs', 'qrcode']);
 
 import Switch from '../ui/Switch.vue';
 
@@ -50,10 +52,6 @@ const isEnabled = computed(() => props.profile?.enabled !== false);
       </div>
 
       <div class="shrink-0 flex items-center gap-1 opacity-100 transition-opacity duration-200" :class="compact ? 'self-end flex-wrap justify-end' : ''">
-
-		<button @click.stop="emit('preview')" class="p-2.5 rounded-full hover:bg-primary-50 dark:hover:bg-white/10 text-gray-400 hover:text-primary-500 transition-colors min-w-[44px] min-h-[44px] lg:min-w-0 lg:min-h-0 flex items-center justify-center" title="预览节点">
-			<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-		</button>
 		<button @click.stop="emit('qrcode')" class="p-2.5 rounded-full hover:bg-primary-50 dark:hover:bg-white/10 text-gray-400 hover:text-primary-500 transition-colors min-w-[44px] min-h-[44px] lg:min-w-0 lg:min-h-0 flex items-center justify-center" title="显示二维码">
 			<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
 				<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 3.75 9.375v-4.5ZM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 0 1-1.125-1.125v-4.5ZM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 13.5 9.375v-4.5Z" />
@@ -97,12 +95,12 @@ const isEnabled = computed(() => props.profile?.enabled !== false);
        </div>
       <div class="flex items-center gap-1 transition-opacity duration-200">
         <template v-if="isSorting">
-          <button @click="emit('move-up')" class="p-1 rounded-full hover:bg-gray-500/10 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200" title="上移">
+          <button @click="emit('move-up')"  :disabled="!canMoveUp" class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg hover:bg-gray-500/10 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 disabled:opacity-30 disabled:cursor-not-allowed" title="上移" aria-label="上移">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" />
             </svg>
           </button>
-          <button @click="emit('move-down')" class="p-1 rounded-full hover:bg-gray-500/10 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200" title="下移">
+          <button @click="emit('move-down')"  :disabled="!canMoveDown" class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg hover:bg-gray-500/10 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 disabled:opacity-30 disabled:cursor-not-allowed" title="下移" aria-label="下移">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
             </svg>
