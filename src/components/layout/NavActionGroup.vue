@@ -1,6 +1,4 @@
 <script setup>
-import { computed } from 'vue';
-import { useRoute } from 'vue-router';
 import BaseIcon from '../ui/BaseIcon.vue';
 import ThemeToggle from '../features/ThemeToggle.vue';
 import LoginEntryButton from './LoginEntryButton.vue';
@@ -43,24 +41,6 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['openSettings', 'toggleLayout', 'logout']);
-const route = useRoute();
-const showPublicFeedback = computed(() => !props.isLoggedIn && (route.name === 'Home' || route.name === 'Explore'));
-const canShowExplore = computed(() => props.showExplore);
-const isExploreActive = computed(() => route.path === '/explore');
-const exploreBtnClass = computed(() => {
-  const classes = buildBtnClass('neutral');
-  if (isExploreActive.value) {
-    classes.push('bg-primary-50', 'text-primary-600', 'dark:bg-primary-900/20', 'dark:text-primary-400', 'ring-1', 'ring-primary-400/40');
-  }
-  return classes;
-});
-
-function handlePublicFeedback() {
-  if (typeof window !== 'undefined') {
-    window.dispatchEvent(new CustomEvent('open-guestbook'));
-  }
-}
-
 function buildBtnClass(type) {
   const base = ['nav-action-btn', props.roundedClass];
 
@@ -78,26 +58,6 @@ function buildBtnClass(type) {
 
 <template>
   <div class="flex items-center gap-2">
-    <router-link
-      v-if="canShowExplore"
-      to="/explore"
-      :class="exploreBtnClass"
-      title="公开页"
-      aria-label="公开页"
-    >
-      <BaseIcon :path="NAV_ICONS.explore" className="h-5 w-5" />
-    </router-link>
-
-    <button
-      v-if="showPublicFeedback"
-      @click="handlePublicFeedback"
-      :class="buildBtnClass('neutral')"
-      title="反馈建议"
-      aria-label="反馈建议"
-    >
-      <BaseIcon :path="NAV_ICONS.feedback" className="h-5 w-5" />
-    </button>
-
     <ThemeToggle />
 
     <div v-if="showDivider" class="h-4 w-px bg-gray-200 dark:bg-white/10 mx-1"></div>

@@ -65,12 +65,9 @@ export async function handleDisguiseRequest(context, preloadedSettings = null) {
     // 3. Disguise Logic
     // If we are here, User is NOT authenticated. we check if we should block the request.
 
-    // [Public Page Logic]
-    // If Public Page is enabled, we allow access to root '/' and '/explore'.
-    // NOTE: We do NOT automatically allow /login here anymore if disguise is on.
-    const isPublicAccessAllowed = url.pathname === '/' || (settings.enablePublicPage && url.pathname === '/explore');
-    if (isPublicAccessAllowed) {
-        return null; // Allow access
+    // Keep the login entry accessible; public pages are no longer served.
+    if (url.pathname === '/') {
+        return null;
     }
 
     // List of protected SPA routes that should be hidden/disguised

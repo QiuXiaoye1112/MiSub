@@ -229,7 +229,7 @@ watch(() => props.profile, (newProfile) => {
       manualNodes: [],
       customId: '',
       expiresAt: '',
-      isPublic: true,
+      isPublic: false,
       description: '',
       prefixSettings: {
         enableManualNodes: null,
@@ -244,6 +244,7 @@ watch(() => props.profile, (newProfile) => {
 
 const handleConfirm = () => {
   const profileToSave = JSON.parse(JSON.stringify(localProfile.value));
+  profileToSave.isPublic = false;
   if (profileToSave.expiresAt) {
     try {
       // Set time to the end of the selected day in local time, then convert to ISO string

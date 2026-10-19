@@ -202,4 +202,24 @@ describe('api-handler storage helper usage', () => {
     expect(put).not.toHaveBeenCalledWith('misub_subscriptions_v1', expect.anything());
     expect(put).not.toHaveBeenCalledWith('misub_profiles_v1', expect.anything());
   });
+  it('does not list legacy public profiles after public display is removed', async () => {
+    const { handlePublicProfilesRequest } = await import('../../functions/modules/api-handler.js');
+    getAllProfiles.mockResolvedValue([{ id: 'legacy-public', name: 'Legacy', enabled: true, isPublic: true }]);
+    const response = await handlePublicProfilesRequest({ MISUB_DB: {} });
+    const payload = await response.json();
+    expect(response.status).toBe(404);
+    expect(payload.error).toBe('Public page has been removed');
+  });
+
+  it('ignores saved public-page settings when returning login configuration', async () => {
+    const { handlePublicConfig } = await import('../../functions/modules/api-handler.js');
+    get.mockResolvedValue({ enablePublicPage: true, customLoginPath: 'private-login', customPage: { enabled: true, hideHeader: true } });
+    const response = await handlePublicConfig({ MISUB_DB: {} });
+    const payload = await response.json();
+    expect(payload.enablePublicPage).toBe(false);
+    expect(payload.customPage.enabled).toBe(false);
+    expect(payload.customPage.hideHeader).toBe(false);
+    expect(payload.customLoginPath).toBe('private-login');
+  });
+
 });

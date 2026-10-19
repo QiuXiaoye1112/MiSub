@@ -12,7 +12,7 @@ export const useSessionStore = defineStore('session', () => {
   const initialData = ref(null);
   const subscriptionConfig = ref({}); // [NEW] Added subscriptionConfig
   const defaultPublicConfig = Object.freeze({
-    enablePublicPage: true,
+    enablePublicPage: false,
     customLoginPath: 'login',
     customPage: {
       enabled: false,
@@ -102,7 +102,7 @@ export const useSessionStore = defineStore('session', () => {
     const dataStore = useDataStore();
     dataStore.clearCachedData();
 
-    // 跳转到首页（公开页）
+    // 跳转到登录入口
     router.push({ path: '/' });
   }
 

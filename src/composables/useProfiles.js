@@ -34,9 +34,6 @@ export function useProfiles(markDirty) {
     const index = profiles.value.findIndex(p => p.id === updatedProfile.id);
     if (index !== -1) {
       profiles.value[index].enabled = updatedProfile.enabled;
-      if (updatedProfile.isPublic !== undefined) {
-        profiles.value[index].isPublic = updatedProfile.isPublic;
-      }
       markDirty();
     }
   };
@@ -82,6 +79,7 @@ export function useProfiles(markDirty) {
       showToast('订阅组名称不能为空', 'error');
       return;
     }
+    profileData.isPublic = false;
     if (profileData.customId) {
       profileData.customId = profileData.customId.replace(/[^a-zA-Z0-9-_]/g, '');
       if (profileData.customId && profiles.value.some(p => p.id !== profileData.id && p.customId === profileData.customId)) {

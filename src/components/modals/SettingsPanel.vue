@@ -7,7 +7,6 @@ import SettingsLayout from '../layout/SettingsLayout.vue';
 // 导入侧边栏和设置组件
 import SettingsSidebar from '../settings/SettingsSidebar.vue';
 import BasicSettings from '../settings/sections/BasicSettings.vue';
-import HomeSettings from '../settings/sections/HomeSettings.vue';
 import ServiceSettings from '../settings/sections/ServiceSettings.vue';
 
 
@@ -35,7 +34,6 @@ const activeTab = ref('basic');
 const currentTabLabel = computed(() => {
   switch (activeTab.value) {
     case 'basic': return '基础设置';
-    case 'home': return '首页设置';
     case 'service': return '服务集成';
     case 'client': return '客户端管理';
     case 'system': return '系统设置';
@@ -77,7 +75,6 @@ defineExpose({ handleSave: handleSaveAndReturnStatus });
           </div>
         </div>
         <BasicSettings v-show="activeTab === 'basic'" :settings="settings" :disguiseConfig="disguiseConfig" />
-        <HomeSettings v-show="activeTab === 'home'" :settings="settings" />
         <ServiceSettings v-show="activeTab === 'service'" :settings="settings" />
         <ClientSettings v-show="activeTab === 'client'" />
         <div v-show="activeTab === 'system'" class="space-y-6">

@@ -16,7 +16,7 @@ export const DEFAULT_SETTINGS = {
     NotifyThresholdPercent: 90,
     enableTrafficNode: false,
     enableFlagEmoji: true,
-    enablePublicPage: true,
+    enablePublicPage: false,
     storageType: 'kv',
     autoUpdateInterval: 0,
     nodeTransformPresets: [],

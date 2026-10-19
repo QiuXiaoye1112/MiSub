@@ -18,7 +18,7 @@ function normalizeProfile(profile = {}) {
     normalized.subscriptions = Array.isArray(profile.subscriptions) ? profile.subscriptions : [];
     normalized.manualNodes = Array.isArray(profile.manualNodes) ? profile.manualNodes : [];
     normalized.enabled = profile.enabled !== false;
-    normalized.isPublic = profile.isPublic === true;
+    normalized.isPublic = false;
     normalized.downloadCount = Number(profile.downloadCount) || 0;
     return normalized;
 }
@@ -544,87 +544,8 @@ export async function handleSettingsReset(env) {
  * @param {Object} env - Cloudflare环境对象
  * @returns {Promise<Response>} HTTP响应
  */
-export async function handlePublicProfilesRequest(env) {
-    try {
-        const storageAdapter = await getStorageAdapter(env);
-        const cachedSettings = await SettingsCache.get(env);
-        const [profiles, settings] = await Promise.all([
-            typeof storageAdapter.getAllProfiles === 'function'
-                ? storageAdapter.getAllProfiles()
-                : storageAdapter.get(KV_KEY_PROFILES).then(res => res || []),
-            Promise.resolve(cachedSettings || {}).then(res => res || {})
-        ]);
-
-        const profileToken = settings.profileToken || 'profiles';
-
-        // 获取公告配置（仅当启用时返回）
-        const announcement = settings.announcement?.enabled ? {
-            enabled: true, // [修复] 必须包含此字段，否则前端 v-if 判断会失败
-            title: settings.announcement.title || '',
-            content: settings.announcement.content || '',
-            type: settings.announcement.type || 'info',
-            dismissible: settings.announcement.dismissible !== false,
-            updatedAt: settings.announcement.updatedAt
-        } : null;
-
-        // Hero Configuration
-        const hero = {
-            title1: settings.heroTitle1 || '发现',
-            title2: settings.heroTitle2 || '优质订阅',
-            description: settings.heroDescription || '浏览并获取由管理员分享的精选订阅组合，一键导入到您的客户端。'
-        };
-
-
-        // Guestbook Config (Safe subset)
-        const guestbook = {
-            enabled: settings.guestbook?.enabled,
-            requireAudit: settings.guestbook?.requireAudit,
-            allowAnonymous: settings.guestbook?.allowAnonymous,
-        };
-
-        // 过滤出公开且启用的订阅组
-        const publicProfiles = profiles
-            .map(normalizeProfile)
-            .filter(p => p.isPublic && p.enabled)
-            .map(p => ({
-                id: p.id,
-                name: p.name,
-                description: p.description || '',
-                customId: p.customId,
-                updatedAt: p.updatedAt,
-                subscriptionCount: (p.subscriptions || []).length,
-                manualNodeCount: (p.manualNodes || []).length,
-            }));
-
-        // Custom Page Config
-        const customPage = {
-            enabled: settings.customPage?.enabled || false,
-            type: settings.customPage?.type || 'html',
-            content: settings.customPage?.content || '',
-            css: settings.customPage?.css || '',
-            useDefaultLayout: settings.customPage?.useDefaultLayout !== false,
-            allowExternalStylesheets: settings.customPage?.allowExternalStylesheets === true,
-            allowScripts: settings.customPage?.allowScripts === true,
-            hideBranding: settings.customPage?.hideBranding === true,
-            hideHeader: settings.customPage?.hideHeader === true,
-            hideFooter: settings.customPage?.hideFooter === true
-        };
-        
-        return createJsonResponse({
-            success: true,
-            data: publicProfiles,
-            config: {
-                profileToken,
-                announcement,
-                hero,
-                guestbook,
-                customPage
-            }
-        });
-    } catch (e) {
-        console.error('[API Error /public/profiles]', e);
-        return createErrorResponse('获取公开订阅组失败', 500);
-    }
+export async function handlePublicProfilesRequest() {
+    return createJsonResponse({ error: 'Public page has been removed' }, 404);
 }
 
 /**
@@ -641,16 +562,16 @@ export async function handlePublicConfig(env) {
         const mergedSettings = { ...defaultSettings, ...settings };
 
         return createJsonResponse({
-            enablePublicPage: mergedSettings.enablePublicPage,
+            enablePublicPage: false,
             customLoginPath: mergedSettings.customLoginPath,
             customPage: {
-                enabled: mergedSettings.customPage?.enabled || false,
-                useDefaultLayout: mergedSettings.customPage?.useDefaultLayout !== false,
-                allowExternalStylesheets: mergedSettings.customPage?.allowExternalStylesheets === true,
-                allowScripts: mergedSettings.customPage?.allowScripts === true,
-                hideBranding: mergedSettings.customPage?.hideBranding === true,
-                hideHeader: mergedSettings.customPage?.hideHeader === true,
-                hideFooter: mergedSettings.customPage?.hideFooter === true
+                enabled: false,
+                useDefaultLayout: true,
+                allowExternalStylesheets: false,
+                allowScripts: false,
+                hideBranding: false,
+                hideHeader: false,
+                hideFooter: false
             }
         });
     } catch (e) {

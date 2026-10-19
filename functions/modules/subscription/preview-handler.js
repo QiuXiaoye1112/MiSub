@@ -1,6 +1,4 @@
-import { StorageFactory } from '../../storage-adapter.js';
 import { createJsonResponse, createErrorResponse } from '../utils.js';
-import { KV_KEY_PROFILES } from '../config.js';
 import { handleProfileMode } from './profile-handler.js';
 import { handleSingleSubscriptionMode, handleDirectUrlMode } from './single-subscription.js';
 
@@ -26,45 +24,8 @@ export function determineRequestMode(requestData) {
  * @param {Object} env - Cloudflare环境对象
  * @returns {Promise<Response>} HTTP响应
  */
-export async function handlePublicPreviewRequest(request, env) {
-    if (request.method !== 'POST') {
-        return createJsonResponse('Method Not Allowed', 405);
-    }
-
-    try {
-        const requestData = await request.json();
-        const { profileId, userAgent = 'MiSub-Public-Preview/1.0' } = requestData;
-
-        if (!profileId) {
-            return createJsonResponse({ error: 'Missing profile ID' }, 400);
-        }
-
-        // 验证是否为公开订阅组
-        const storageAdapter = StorageFactory.createAdapter(env, await StorageFactory.getStorageType(env));
-        const profile = typeof storageAdapter.getProfileById === 'function'
-            ? await storageAdapter.getProfileById(profileId)
-            : (await storageAdapter.get(KV_KEY_PROFILES) || []).find(p => (p.customId && p.customId === profileId) || p.id === profileId);
-
-        if (!profile || !profile.enabled || !profile.isPublic) {
-            return createJsonResponse({ error: 'Profile not found or not public' }, 404);
-        }
-
-        // 调用 handleProfileMode 获取节点（公开页默认显示处理后的结果）
-        const shouldSkipCertificateVerify = Boolean(
-            profile?.builtinSkipCertVerify ||
-            profile?.transformBackendScv ||
-            profile?.skipCertVerify ||
-            profile?.skipCertificateVerify ||
-            profile?.settings?.builtinSkipCertVerify ||
-            profile?.settings?.transformBackendScv
-        );
-        const result = await handleProfileMode(request, env, profile.id, userAgent, true, shouldSkipCertificateVerify);
-
-        return createJsonResponse(result);
-
-    } catch (e) {
-        return createErrorResponse(`Preview failed: ${e.message}`, 500);
-    }
+export async function handlePublicPreviewRequest() {
+    return createJsonResponse({ error: 'Public profile display has been removed' }, 404);
 }
 
 /**
