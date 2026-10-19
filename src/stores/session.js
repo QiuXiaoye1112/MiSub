@@ -77,8 +77,8 @@ export const useSessionStore = defineStore('session', () => {
     const result = await apiLogin(password);
     if (result.success) {
       handleLoginSuccess();
-      // 登录成功后跳转到仪表盘
-      router.push({ path: '/dashboard' });
+      // 登录成功后跳转到我的订阅
+      router.push({ path: '/dashboard/subscriptions' });
     } else {
       throw new Error(result.error || '登录失败');
     }

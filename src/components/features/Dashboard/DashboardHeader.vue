@@ -12,7 +12,7 @@ defineEmits(['openBulkImport']);
 <template>
   <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 bg-white/80 dark:bg-gray-900/60 border border-gray-100/80 dark:border-white/10 misub-radius-lg p-5">
     <div class="flex flex-wrap items-center gap-4">
-      <h1 class="text-3xl font-display font-bold text-gray-900 dark:text-white tracking-tight">仪表盘</h1>
+      <h1 class="text-3xl font-display font-bold text-gray-900 dark:text-white tracking-tight">订阅管理</h1>
       <span v-if="formattedTotalRemainingTraffic !== '0 B'"
         class="px-4 py-1.5 text-sm font-semibold text-green-700 bg-green-100/80 dark:text-green-300 dark:bg-green-500/20 rounded-full border border-green-200 dark:border-green-500/30 backdrop-blur-sm">
         剩余总流量: {{ formattedTotalRemainingTraffic }}

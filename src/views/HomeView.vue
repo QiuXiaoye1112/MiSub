@@ -15,10 +15,10 @@ const router = useRouter();
 
 const isExploreRoute = computed(() => route.path === '/explore');
 
-// 如果用户已登录且访问的是首页 /，自动通过逻辑重定向到仪表盘 /dashboard
+// 如果用户已登录且访问的是首页 /，自动跳转到我的订阅
 watchEffect(() => {
     if (sessionState.value === 'loggedIn' && !isExploreRoute.value) {
-        router.replace('/dashboard');
+        router.replace('/dashboard/subscriptions');
     }
 });
 

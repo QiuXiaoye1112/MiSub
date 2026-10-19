@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
 // Lazy load views for better performance
-const DashboardView = () => import('../views/DashboardView.vue');
 const SubscriptionGroupsView = () => import('../views/SubscriptionGroupsView.vue');
 const ManualNodesView = () => import('../views/ManualNodesView.vue');
 const MySubscriptionsView = () => import('../views/MySubscriptionsView.vue');
@@ -20,14 +19,14 @@ const routes = [
     {
         path: '/explore',
         name: 'Explore',
-        redirect: '/dashboard',
-        meta: { title: '仪表盘' }
+        redirect: '/dashboard/subscriptions',
+        meta: { title: '我的订阅' }
     },
     {
         path: '/dashboard',
         name: 'Dashboard',
-        component: DashboardView,
-        meta: { title: '仪表盘' }
+        redirect: '/dashboard/subscriptions',
+        meta: { title: '我的订阅' }
     },
     {
         path: '/dashboard/groups',
