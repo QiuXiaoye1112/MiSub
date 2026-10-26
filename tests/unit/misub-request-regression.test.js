@@ -49,10 +49,11 @@ describe('handleMisubRequest regression coverage', () => {
             name: '机场A',
             url: 'https://airport.example/sub',
             enabled: true,
-            enableNodeCache: true
+            enableNodeCache: true,
+            userInfo: { total: 1073741824, upload: 0, download: 0 }
         }];
         const adapter = createStorageAdapter({
-            settings: { mytoken: 'stable-token', enableFlagEmoji: false, enableTrafficNode: false },
+            settings: { mytoken: 'stable-token', enableFlagEmoji: false, enableTrafficNode: true },
             subscriptions
         });
         createAdapter.mockReturnValue(adapter);
@@ -70,6 +71,8 @@ describe('handleMisubRequest regression coverage', () => {
 
         expect(response.status).toBe(200);
         expect(text).toContain('trojan://pass@example.com:443#');
+        expect(text).not.toContain('127.0.0.1:443');
+        expect(text).not.toContain(encodeURIComponent('流量剩余'));
         expect(adapter.put).toHaveBeenCalledWith(
             'node_cache_subscription_sub-a',
             expect.objectContaining({

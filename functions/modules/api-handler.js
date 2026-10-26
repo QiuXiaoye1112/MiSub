@@ -454,6 +454,7 @@ export async function handleSettingsSave(request, env) {
         const storageAdapter = await getStorageAdapter(env);
         const oldSettings = await storageAdapter.get(KV_KEY_SETTINGS) || {};
         const finalSettings = { ...oldSettings, ...newSettings };
+        delete finalSettings.enableTrafficNode;
 
         // 使用存储适配器保存设置
         try {

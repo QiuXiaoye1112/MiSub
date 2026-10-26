@@ -27,6 +27,22 @@ const props = defineProps({
   cancelText: {
     type: String,
     default: '取消'
+  },
+  panelClass: {
+    type: String,
+    default: ''
+  },
+  bodyClass: {
+    type: String,
+    default: 'px-6 pb-6 grow overflow-y-auto'
+  },
+  titleClass: {
+    type: String,
+    default: 'p-6 pb-4 shrink-0'
+  },
+  hideFooter: {
+    type: Boolean,
+    default: false
   }
 });
 
@@ -122,30 +138,33 @@ const handleConfirm = async () => {
           ref="modalPanelRef"
           tabindex="-1"
           class="bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl misub-radius-lg shadow-2xl w-full text-left ring-1 ring-black/5 dark:ring-white/10 flex flex-col max-h-[85vh] lg:max-h-[90vh] border border-white/20 dark:border-white/5 focus:outline-none"
-          :class="{
-            'max-w-sm': size === 'sm',
-            'max-w-md': size === 'md',
-            'max-w-lg': size === 'lg',
-            'max-w-xl': size === 'xl',
-            'max-w-2xl': size === '2xl',
-            'max-w-4xl': size === '4xl',
-            'max-w-5xl': size === '5xl',
-            'max-w-6xl': size === '6xl',
-            'max-w-7xl': size === '7xl'
-          }" @click.stop>
-          <div :id="titleId" class="p-6 pb-4 shrink-0">
+          :class="[
+            panelClass,
+            {
+              'max-w-sm': size === 'sm',
+              'max-w-md': size === 'md',
+              'max-w-lg': size === 'lg',
+              'max-w-xl': size === 'xl',
+              'max-w-2xl': size === '2xl',
+              'max-w-4xl': size === '4xl',
+              'max-w-5xl': size === '5xl',
+              'max-w-6xl': size === '6xl',
+              'max-w-7xl': size === '7xl'
+            }
+          ]" @click.stop>
+          <div :id="titleId" :class="titleClass">
             <slot name="title">
               <h3 class="text-lg font-bold text-gray-900 dark:text-white">确认操作</h3>
             </slot>
           </div>
 
-          <div class="px-6 pb-6 grow overflow-y-auto">
+          <div :class="bodyClass">
             <slot name="body">
               <p class="text-sm text-gray-500 dark:text-gray-400">你确定要继续吗？</p>
             </slot>
           </div>
 
-          <div class="p-6 pt-4 flex justify-end space-x-3 shrink-0 border-t border-gray-200 dark:border-gray-700">
+          <div v-if="!hideFooter" class="p-6 pt-4 flex justify-end space-x-3 shrink-0 border-t border-gray-200 dark:border-gray-700">
             <slot name="footer">
               <button @click="emit('update:show', false)"
                 class="px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 font-semibold text-sm misub-radius-lg transition-colors">{{

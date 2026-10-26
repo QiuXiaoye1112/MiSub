@@ -57,7 +57,7 @@ const handleRowClick = (node) => {
         <div class="w-full overflow-hidden rounded-xl border border-gray-200/70 dark:border-white/10">
           <!-- 表头 -->
           <div class="sticky top-0 z-10 border-b border-gray-100 bg-gray-50/50 backdrop-blur-md dark:border-white/5 dark:bg-gray-800/80">
-            <div class="grid min-h-[3.5rem] grid-cols-12 gap-2 px-6 py-3 items-center text-[11px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">
+            <div class="grid min-h-12 grid-cols-12 gap-2 px-6 py-2 items-center text-[11px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">
               <div v-if="selectionMode" class="col-span-1 flex justify-center text-indigo-500">Pick</div>
               <div :class="selectionMode ? 'col-span-3' : 'col-span-4'">Node Name</div>
               <div class="col-span-3 hidden sm:block">Server Address</div>
@@ -78,7 +78,7 @@ const handleRowClick = (node) => {
                 class="group border-b border-gray-50 dark:border-white/5 hover:bg-gray-50/80 dark:hover:bg-indigo-500/5 transition-all"
                 :class="{ 'bg-indigo-50/30 dark:bg-indigo-500/10': selectionMode && selectedUrls.has(node.url), 'cursor-pointer': selectionMode }"
               >
-                <div class="grid min-h-[3.5rem] grid-cols-12 gap-2 px-6 py-3 items-center">
+                <div class="grid min-h-12 grid-cols-12 gap-2 px-6 py-2 items-center">
                   <!-- Checkbox (Selection Mode Only) -->
                   <div v-if="selectionMode" class="col-span-1 flex justify-center">
                     <div class="w-5 h-5 rounded-lg border-2 flex items-center justify-center transition-all duration-300"

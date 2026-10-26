@@ -521,9 +521,6 @@ export function migrateConfigSettings(config) {
     if (migratedConfig.hasOwnProperty('enableAccessLog')) {
         migratedConfig.enableAccessLog = toBoolean(migratedConfig.enableAccessLog);
     }
-    if (migratedConfig.hasOwnProperty('enableTrafficNode')) {
-        migratedConfig.enableTrafficNode = toBoolean(migratedConfig.enableTrafficNode);
-    }
     // [Migration] 映射旧名到新名（如果新名不存在且旧名存在）
     if (!migratedConfig.hasOwnProperty('builtinSkipCertVerify') && migratedConfig.hasOwnProperty('transformBackendScv')) {
         migratedConfig.builtinSkipCertVerify = toBoolean(migratedConfig.transformBackendScv);

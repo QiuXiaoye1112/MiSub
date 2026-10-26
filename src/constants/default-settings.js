@@ -14,11 +14,9 @@ export const DEFAULT_SETTINGS = {
     accessLogPersistenceMode: 'light',
     NotifyThresholdDays: 3,
     NotifyThresholdPercent: 90,
-    enableTrafficNode: false,
     enableFlagEmoji: true,
     enablePublicPage: false,
     storageType: 'kv',
-    autoUpdateInterval: 0,
     nodeTransformPresets: [],
     announcement: {
         enabled: true,

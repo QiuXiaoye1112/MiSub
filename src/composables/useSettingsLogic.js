@@ -49,7 +49,9 @@ export function useSettingsLogic() {
         try {
             const result = await fetchSettings();
             if (result.success) {
-                const incoming = result.data && typeof result.data === 'object' ? result.data : {};
+                const incoming = result.data && typeof result.data === 'object' ? { ...result.data } : {};
+                delete incoming.autoUpdateInterval;
+                delete incoming.enableTrafficNode;
                 settings.value = { ...DEFAULT_SETTINGS, ...incoming };
 
                 // 初始化前缀配置
@@ -106,6 +108,7 @@ export function useSettingsLogic() {
             delete settingsToSave.prependSubName;
             delete settingsToSave.nodeTransform;
             delete settingsToSave.clashRuleLevel;
+            delete settingsToSave.enableTrafficNode;
 
             const result = await saveSettings(settingsToSave);
             if (result.success) {

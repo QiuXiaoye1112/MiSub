@@ -65,7 +65,7 @@ const goToPage = (page) => {
 </script>
 
 <template>
-  <div v-if="totalPages > 1" class="shrink-0 border-t border-gray-200 bg-gray-50/80 p-4 dark:border-gray-700 dark:bg-gray-900/40 sm:p-5">
+  <div v-if="totalPages > 1" class="shrink-0 border-t border-gray-200 bg-gray-50/80 px-4 py-2 dark:border-gray-700 dark:bg-gray-900/40">
     <!-- 桌面端完整分页 -->
     <div v-if="currentPage > 0" class="hidden sm:flex items-center justify-between">
       <div class="text-sm text-gray-700 dark:text-gray-300">

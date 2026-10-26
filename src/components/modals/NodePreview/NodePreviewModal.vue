@@ -471,7 +471,15 @@ const goToPage = (page) => {
 </script>
 
 <template>
-  <Modal :show="show" size="6xl" @update:show="value => !value && closeModal()">
+  <Modal
+    :show="show"
+    size="6xl"
+    panel-class="!h-[calc(100dvh-2rem)] !max-h-[calc(100dvh-2rem)] !max-w-[calc(100vw-2rem)]"
+    body-class="min-h-0 grow flex flex-col overflow-hidden px-0 pb-0"
+    title-class="px-4 py-3 shrink-0"
+    :hide-footer="true"
+    @update:show="value => !value && closeModal()"
+  >
     <template #title>
       <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between px-2">
         <div class="min-w-0 space-y-1">
@@ -509,13 +517,13 @@ const goToPage = (page) => {
     <template #body>
 
       <!-- 统计信息 -->
-      <div v-if="!loading && !error && Object.keys(protocolStats).length > 0" class="border-b border-gray-100 bg-gray-50/30 px-4 py-6 dark:border-gray-800/50 dark:bg-gray-900/10 sm:px-8">
+      <div v-if="!loading && !error && Object.keys(protocolStats).length > 0" class="shrink-0 border-b border-gray-100 bg-gray-50/30 px-4 py-2 dark:border-gray-800/50 dark:bg-gray-900/10 sm:px-6">
         <!-- 桌面端统计布局 (Premium Cards) -->
-        <div class="hidden lg:grid grid-cols-4 gap-6">
-          <div class="group relative rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all hover:shadow-md dark:border-white/5 dark:bg-white/5">
-             <div class="flex items-center gap-4">
-               <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400">
-                 <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+        <div class="hidden lg:grid grid-cols-4 gap-3">
+          <div class="group relative rounded-xl border border-gray-100 bg-white p-3 shadow-sm transition-all hover:shadow-md dark:border-white/5 dark:bg-white/5">
+             <div class="flex items-center gap-3">
+               <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400">
+                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
                </div>
                <div>
                  <div class="text-xs font-bold text-gray-400 uppercase tracking-tighter dark:text-gray-500">Nodes Total</div>
@@ -525,10 +533,10 @@ const goToPage = (page) => {
              <div class="absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-blue-500/10 transition-colors pointer-events-none"></div>
           </div>
           
-          <div class="group relative rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all hover:shadow-md dark:border-white/5 dark:bg-white/5">
-             <div class="flex items-center gap-4">
-               <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-purple-50 text-purple-600 dark:bg-purple-500/10 dark:text-purple-400">
-                 <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+          <div class="group relative rounded-xl border border-gray-100 bg-white p-3 shadow-sm transition-all hover:shadow-md dark:border-white/5 dark:bg-white/5">
+             <div class="flex items-center gap-3">
+               <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-purple-50 text-purple-600 dark:bg-purple-500/10 dark:text-purple-400">
+                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                </div>
                <div>
                  <div class="text-xs font-bold text-gray-400 uppercase tracking-tighter dark:text-gray-500">Protocols</div>
@@ -538,10 +546,10 @@ const goToPage = (page) => {
               <div class="absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-purple-500/10 transition-colors pointer-events-none"></div>
           </div>
 
-          <div class="group relative rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all hover:shadow-md dark:border-white/5 dark:bg-white/5">
-             <div class="flex items-center gap-4">
-               <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-50 text-orange-600 dark:bg-orange-500/10 dark:text-orange-400">
-                 <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          <div class="group relative rounded-xl border border-gray-100 bg-white p-3 shadow-sm transition-all hover:shadow-md dark:border-white/5 dark:bg-white/5">
+             <div class="flex items-center gap-3">
+               <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-50 text-orange-600 dark:bg-orange-500/10 dark:text-orange-400">
+                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                </div>
                <div>
                  <div class="text-xs font-bold text-gray-400 uppercase tracking-tighter dark:text-gray-500">Regions</div>
@@ -551,10 +559,10 @@ const goToPage = (page) => {
               <div class="absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-orange-500/10 transition-colors pointer-events-none"></div>
           </div>
 
-          <div class="group relative rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all hover:shadow-md dark:border-white/5 dark:bg-white/5">
-             <div class="flex items-center gap-4">
-               <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400">
-                 <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+          <div class="group relative rounded-xl border border-gray-100 bg-white p-3 shadow-sm transition-all hover:shadow-md dark:border-white/5 dark:bg-white/5">
+             <div class="flex items-center gap-3">
+               <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400">
+                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
                </div>
                <div>
                  <div class="text-xs font-bold text-gray-400 uppercase tracking-tighter dark:text-gray-500">Total Pages</div>
@@ -566,14 +574,14 @@ const goToPage = (page) => {
         </div>
 
         <!-- 移动端统计布局 (Compact Cards) -->
-        <div class="grid grid-cols-2 gap-3 lg:hidden">
-            <div class="flex flex-col gap-1 rounded-2xl bg-indigo-50/50 p-4 dark:bg-indigo-500/10">
+        <div class="grid grid-cols-2 gap-2 lg:hidden">
+            <div class="flex flex-col gap-0.5 rounded-xl bg-indigo-50/50 p-2.5 dark:bg-indigo-500/10">
                 <span class="text-[10px] font-bold text-indigo-400 uppercase tracking-wider">总节点数</span>
-                <span class="text-2xl font-black text-indigo-600 dark:text-indigo-400">{{ allNodes.length }}</span>
+                <span class="text-xl font-black text-indigo-600 dark:text-indigo-400">{{ allNodes.length }}</span>
             </div>
-            <div class="flex flex-col gap-1 rounded-2xl bg-purple-50/50 p-4 dark:bg-purple-500/10">
+            <div class="flex flex-col gap-0.5 rounded-xl bg-purple-50/50 p-2.5 dark:bg-purple-500/10">
                 <span class="text-[10px] font-bold text-purple-400 uppercase tracking-wider">协议类型</span>
-                <span class="text-2xl font-black text-purple-600 dark:text-purple-400">{{ Object.keys(protocolStats).length }}</span>
+                <span class="text-xl font-black text-purple-600 dark:text-purple-400">{{ Object.keys(protocolStats).length }}</span>
             </div>
         </div>
       </div>
@@ -581,7 +589,7 @@ const goToPage = (page) => {
       <!-- 筛选控件 - 统一响应式布局 -->
       <NodeFilters
         v-if="!loading && !error && Object.keys(protocolStats).length > 0"
-        class="px-3 sm:px-6 py-2 sm:py-4 border-b border-gray-200 dark:border-gray-700"
+        class="shrink-0 px-3 sm:px-5 py-1 sm:py-2 border-b border-gray-200 dark:border-gray-700"
         :search-query="searchQuery"
         :protocol-filter="protocolFilter"
         :region-filter="regionFilter"
@@ -599,8 +607,8 @@ const goToPage = (page) => {
       />
 
       <!-- 节点列表 -->
-      <div class="flex-1 overflow-hidden bg-white dark:bg-gray-800" :class="{ 'pb-24 sm:pb-28': pickingMode }" style="min-height: 0;">
-        <div class="h-full overflow-y-auto px-4 py-4 sm:px-6">
+      <div class="min-h-0 flex-1 overflow-hidden bg-white dark:bg-gray-800" :class="{ 'pb-24 sm:pb-28': pickingMode }">
+        <div class="h-full overflow-y-auto px-2 py-1 sm:px-4 sm:py-2">
           <!-- 加载状态 -->
           <div v-if="loading" class="flex h-64 items-center justify-center">
             <div class="rounded-xl border border-gray-200/70 bg-white px-8 py-8 text-center shadow-sm dark:border-white/10 dark:bg-white/5">

@@ -1,5 +1,5 @@
 import { StorageFactory } from '../../storage-adapter.js';
-import { migrateConfigSettings, formatBytes, migrateProfileIds, base64EncodeUtf8 } from '../utils.js';
+import { migrateConfigSettings, migrateProfileIds, base64EncodeUtf8 } from '../utils.js';
 import { generateCombinedNodeList } from '../../services/subscription-service.js';
 import { sendEnhancedTgNotification, tgEscape } from '../notifications.js';
 import { KV_KEY_SUBS, KV_KEY_PROFILES, KV_KEY_SETTINGS, DEFAULT_SETTINGS as defaultSettings } from '../config.js';
@@ -337,27 +337,6 @@ export async function handleMisubRequest(context) {
         // to ensure we have the correct stats and avoid duplicates.
     }
 
-    let prependedContentForSubconverter = '';
-
-    if (isProfileExpired) { // Use the flag set earlier
-        prependedContentForSubconverter = ''; // Expired node is now in targetMisubs
-    } else {
-        // Otherwise, add traffic remaining info if applicable
-        const totalRemainingBytes = targetMisubs.reduce((acc, sub) => {
-            if (sub.enabled && sub.userInfo && sub.userInfo.total > 0) {
-                const used = (sub.userInfo.upload || 0) + (sub.userInfo.download || 0);
-                const remaining = sub.userInfo.total - used;
-                return acc + Math.max(0, remaining);
-            }
-            return acc;
-        }, 0);
-        if (config.enableTrafficNode !== false && totalRemainingBytes > 0) {
-            const formattedTraffic = formatBytes(totalRemainingBytes);
-            const fakeNodeName = `流量剩余 ≫ ${formattedTraffic}`;
-            prependedContentForSubconverter = `trojan://00000000-0000-0000-0000-000000000000@127.0.0.1:443#${encodeURIComponent(fakeNodeName)}`;
-        }
-    }
-
     // [Subconverter Engine Selection] Priority: URL Parameter > Profile Settings > Global Settings
     const profileSub = currentProfile?.subconverter || {};
     const globalSub = config.subconverter || {};
@@ -510,7 +489,7 @@ export async function handleMisubRequest(context) {
             { ...config, enableAccessLog: false }, // [Deferred Logging] Disable service-side logging, we will log manually in handler
             userAgentHeader,
             targetMisubs,
-            prependedContentForSubconverter,
+            '',
             {
                 ...generationSettings,
                 // [强制透传] 确保 ruleLevel 在订阅组内能够生效
