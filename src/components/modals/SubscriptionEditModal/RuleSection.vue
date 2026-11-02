@@ -82,46 +82,6 @@ const customKeywordModel = computed({
   set: (val) => emit('update:customKeyword', val)
 });
 
-// 动态规则解释文本
-const ruleSummary = computed(() => {
-  if (!props.selectedRules || props.selectedRules.length === 0) {
-    return '未设置过滤规则，将保留该订阅的所有节点。';
-  }
-
-  const keywordRules = props.selectedRules.filter(r => r.type === 'keyword' || r.type === 'custom');
-  const regionRules = props.selectedRules.filter(r => r.type === 'region');
-  const protocolRules = props.selectedRules.filter(r => r.type === 'protocol');
-
-  const parts = [];
-
-  if (keywordRules.length > 0) {
-    const kwMode = props.groupModes.keyword === 'keep' ? '包含' : '排除';
-    const names = keywordRules.map(r => r.label).join('、');
-    parts.push(`优先${kwMode}含 [${names}] 的节点`);
-  }
-
-  const constraints = [];
-  if (regionRules.length > 0) {
-    const regMode = props.groupModes.region === 'keep' ? '属于' : '排除';
-    const names = regionRules.map(r => r.label).join('、');
-    constraints.push(`${regMode}地区 [${names}]`);
-  }
-  if (protocolRules.length > 0) {
-    const protoMode = props.groupModes.protocol === 'keep' ? '属于' : '排除';
-    const names = protocolRules.map(r => r.label).join('、');
-    constraints.push(`${protoMode}协议 [${names}]`);
-  }
-
-  if (constraints.length > 0) {
-    if (parts.length > 0) {
-      parts.push(`其余节点须同时满足：${constraints.join(' 且 ')}`);
-    } else {
-      parts.push(`节点须同时满足：${constraints.join(' 且 ')}`);
-    }
-  }
-
-  return parts.join('；') + '。自定义关键词同样优先处理。';
-});
 </script>
 
 <template>
@@ -280,16 +240,6 @@ const ruleSummary = computed(() => {
             </div>
           </div>
 
-          <!-- 规则逻辑解读说明卡片 -->
-          <div class="rounded-xl p-3 bg-gradient-to-r from-gray-50 to-indigo-50/40 dark:from-gray-800/40 dark:to-indigo-950/20 border border-gray-200/70 dark:border-gray-700/60 text-xs space-y-1.5">
-            <div class="flex items-center gap-1.5 font-semibold text-gray-800 dark:text-gray-200">
-              <span class="text-indigo-500">💡</span>
-              <span>规则逻辑解读</span>
-            </div>
-            <p class="text-gray-600 dark:text-gray-300 leading-relaxed text-[11.5px]">
-              {{ ruleSummary }}
-            </p>
-          </div>
         </div>
 
         <!-- 高级模式（简化版文本编辑器） -->
