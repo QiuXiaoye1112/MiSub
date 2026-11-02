@@ -55,8 +55,8 @@ const handleRowClick = (node) => {
     <div ref="containerRef" class="h-full overflow-y-auto w-full">
       <div class="w-full">
         <!-- 表头 -->
-        <div class="sticky top-0 z-10 border-b border-gray-200/80 bg-gray-50/95 backdrop-blur-md dark:border-gray-700/80 dark:bg-gray-850/95">
-          <div class="grid min-h-10 grid-cols-12 gap-2 px-6 py-2 items-center text-[11px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">
+        <div class="sticky top-0 z-10 border-b border-gray-200/80 bg-gray-50/95 backdrop-blur-md dark:border-gray-700/60 dark:bg-gray-800/95">
+          <div class="grid min-h-10 grid-cols-12 gap-2 px-6 py-2 items-center text-[11px] font-bold text-gray-400 dark:text-gray-400 uppercase tracking-wider">
             <div v-if="selectionMode" class="col-span-1 flex justify-center text-indigo-500">Pick</div>
             <div :class="selectionMode ? 'col-span-3' : 'col-span-4'">Node Name</div>
             <div class="col-span-3 hidden sm:block">Server Address</div>
