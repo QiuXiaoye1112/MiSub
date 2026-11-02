@@ -473,9 +473,8 @@ const goToPage = (page) => {
 <template>
   <Modal
     :show="show"
-    size="6xl"
-    panel-class="!h-[calc(100dvh-2rem)] !max-h-[calc(100dvh-2rem)] !max-w-[calc(100vw-2rem)]"
-    body-class="min-h-0 grow flex flex-col overflow-hidden px-0 pb-0"
+    size="5xl"
+    body-class="min-h-0 flex flex-col overflow-hidden px-0 pb-0"
     title-class="px-3 sm:px-5 py-2.5 shrink-0 border-b border-gray-100 dark:border-gray-800"
     :hide-footer="true"
     @update:show="value => !value && closeModal()"

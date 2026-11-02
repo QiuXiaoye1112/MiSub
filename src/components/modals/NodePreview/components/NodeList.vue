@@ -51,8 +51,8 @@ const handleRowClick = (node) => {
 </script>
 
 <template>
-  <div class="hidden lg:flex flex-1 min-h-0 flex-col overflow-hidden bg-white dark:bg-gray-800">
-    <div ref="containerRef" class="h-full overflow-y-auto w-full">
+  <div class="hidden lg:flex flex-col min-h-0 overflow-hidden bg-white dark:bg-gray-800">
+    <div ref="containerRef" class="max-h-[60vh] overflow-y-auto w-full">
       <div class="w-full">
         <!-- 表头 -->
         <div class="sticky top-0 z-10 border-b border-gray-200/80 bg-gray-50/95 backdrop-blur-md dark:border-gray-700/60 dark:bg-gray-800/95">
