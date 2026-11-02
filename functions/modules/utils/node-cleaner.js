@@ -236,7 +236,8 @@ export function filterNodeObjects(nodes, rules, mode = 'exclude') {
         const nameHit = rules.nameRegex ? rules.nameRegex.test(name) : false;
 
         if (isInclude) {
-            return protocolHit || nameHit;
+            // Selected protocols constrain the name/region rules instead of bypassing them.
+            return (!rules.protocols.size || protocolHit) && (!rules.nameRegex || nameHit);
         }
         return !(protocolHit || nameHit);
     });

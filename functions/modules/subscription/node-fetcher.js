@@ -104,9 +104,12 @@ function applyExcludeRulesToNodes(nodes, ruleText) {
     if (lines.length === 0) return nodes;
 
     const dividerIndex = lines.findIndex(line => line === '---');
-    // 如果没有分隔符，默认全是 exclude
-    const includeLines = dividerIndex === -1 ? [] : lines.slice(dividerIndex + 1);
-    const excludeLines = dividerIndex === -1 ? lines : lines.slice(0, dividerIndex);
+    const includeLines = dividerIndex === -1
+        ? lines.filter(line => line.toLowerCase().startsWith('keep:'))
+        : lines.slice(dividerIndex + 1);
+    const excludeLines = dividerIndex === -1
+        ? lines.filter(line => !line.toLowerCase().startsWith('keep:'))
+        : lines.slice(0, dividerIndex);
 
     // 使用 node-cleaner 中导出的 buildRuleSet
     const includeRules = buildRuleSet(includeLines, true);
@@ -118,7 +121,8 @@ function applyExcludeRulesToNodes(nodes, ruleText) {
     if (includeRules.hasRules) {
         resultNodes = filterNodeObjects(resultNodes, includeRules, 'include');
     }
-    if (excludeRules.hasRules) {
+    // Without a divider, keep: rules select whitelist-only mode, as in subscription output.
+    if (excludeRules.hasRules && (dividerIndex !== -1 || !includeRules.hasRules)) {
         resultNodes = filterNodeObjects(resultNodes, excludeRules, 'exclude');
     }
 

@@ -794,7 +794,8 @@ function filterNodes(nodes, rules, mode = 'exclude') {
         }
 
         if (isInclude) {
-            return protocolHit || nameHit;
+            // Keep protocol and name/region constraints active together, as in the preview.
+            return (!rules.protocols.size || protocolHit) && (!rules.nameRegex || nameHit);
         }
         return !(protocolHit || nameHit);
     });

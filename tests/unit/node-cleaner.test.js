@@ -87,10 +87,9 @@ describe('Node Cleaner Utils', () => {
             HK
             `;
             const rules = buildRuleSet(ruleText);
-            // Include trojan OR name contains HK
+            // Both the protocol and name constraints must match.
             const result = filterNodeObjects(nodes, rules, 'include');
-            // Trojan (JP Node 3) + HK (HK Node 2)
-            expect(result).toHaveLength(2);
+            expect(result).toHaveLength(0);
         });
     });
 });

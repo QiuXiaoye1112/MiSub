@@ -49,10 +49,7 @@ const presetKeywords = [
   { label: '过期', pattern: '过期' },
   { label: '剩余', pattern: '(剩余|流量)' },
   { label: '倍率', pattern: '倍率' },
-  { label: '测试', pattern: '测试' },
-  { label: '维护', pattern: '维护' },
   { label: 'GB', pattern: 'GB' },
-  { label: '2026', pattern: '2026' },
 ];
 
 // 已选择的规则（内置+自定义）

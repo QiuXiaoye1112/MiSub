@@ -223,7 +223,7 @@ const customKeywordModel = computed({
 
           <!-- 提示 -->
           <p class="text-xs text-gray-500 dark:text-gray-400">
-            {{ ruleModeModel === 'keep' ? '仅保留包含所选关键字的节点' : '排除包含所选关键字的节点' }}
+            {{ ruleModeModel === 'keep' ? '选择协议和地区/关键词时，节点须同时满足两类条件；同类规则匹配任意一项即可' : '命中任一所选协议、地区或关键词的节点都会被排除' }}
           </p>
         </div>
 
@@ -247,6 +247,7 @@ const customKeywordModel = computed({
           <div class="mt-2 text-xs text-gray-500 dark:text-gray-400 space-y-1">
             <p>每行一条规则，支持正则表达式。<code class="font-mono">proto:</code> 用于协议匹配。</p>
             <p><code class="font-mono">keep:</code> 表示仅保留匹配项，<code class="font-mono">---</code> 分隔排除和包含规则。</p>
+            <p>包含规则中，协议与地区/关键词须同时匹配；排除规则命中任意一项即排除。</p>
           </div>
         </div>
       </div>
