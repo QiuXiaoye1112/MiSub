@@ -476,38 +476,59 @@ const goToPage = (page) => {
     size="6xl"
     panel-class="!h-[calc(100dvh-2rem)] !max-h-[calc(100dvh-2rem)] !max-w-[calc(100vw-2rem)]"
     body-class="min-h-0 grow flex flex-col overflow-hidden px-0 pb-0"
-    title-class="px-4 py-3 shrink-0"
+    title-class="px-3 sm:px-5 py-2.5 shrink-0 border-b border-gray-100 dark:border-gray-800"
     :hide-footer="true"
     @update:show="value => !value && closeModal()"
   >
     <template #title>
-      <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between px-2">
-        <div class="min-w-0 space-y-1">
-          <div class="flex items-center gap-2">
-            <div class="w-1.5 h-6 bg-indigo-600 rounded-full"></div>
-            <h3 class="truncate text-lg font-black text-gray-900 dark:text-white sm:text-2xl tracking-tight">
+      <div class="flex items-center justify-between gap-3 px-1">
+        <!-- 左侧：指示条 + 标题 + 副标题徽章 + 紧凑统计胶囊 -->
+        <div class="flex flex-wrap items-center gap-2 sm:gap-3 min-w-0">
+          <div class="flex items-center gap-2 min-w-0">
+            <div class="w-1.5 h-5 bg-indigo-600 rounded-full shrink-0"></div>
+            <h3 class="truncate text-base sm:text-lg font-bold text-gray-900 dark:text-white tracking-tight">
               {{ title }}
             </h3>
           </div>
-          <p class="text-[11px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-widest pl-3.5">
+
+          <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 shrink-0">
             {{ subtitle }}
-          </p>
+          </span>
+
+          <!-- 紧凑统计胶囊 (直接置顶，极大节省高度) -->
+          <div v-if="!loading && !error && allNodes.length > 0" class="flex items-center gap-1.5 text-xs">
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 font-semibold text-[11px]">
+              <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+              {{ allNodes.length }} 节点
+            </span>
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 font-semibold text-[11px]">
+              <span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
+              {{ Object.keys(protocolStats).length }} 协议
+            </span>
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300 font-semibold text-[11px]">
+              <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+              {{ Object.keys(regionStats).length }} 地区
+            </span>
+          </div>
         </div>
-        <div class="flex items-center gap-3 self-end sm:self-auto">
+
+        <!-- 右侧：挑选模式按钮 + 关闭按钮 -->
+        <div class="flex items-center gap-2 shrink-0">
           <button
             v-if="profileId"
             @click="pickingMode = !pickingMode"
-            class="px-4 py-2 text-xs font-bold rounded-xl transition-all shadow-sm active:scale-95"
-            :class="pickingMode ? 'bg-indigo-600 text-white shadow-indigo-500/20' : 'bg-gray-100 dark:bg-gray-700/50 text-gray-600 dark:text-gray-300 hover:bg-gray-200'"
+            class="px-3 py-1.5 text-xs font-semibold rounded-lg transition-all shadow-sm active:scale-95"
+            :class="pickingMode ? 'bg-indigo-600 text-white shadow-indigo-500/20' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200'"
           >
             {{ pickingMode ? '退出挑选' : '挑选节点' }}
           </button>
           <button
             @click="closeModal"
-            class="p-2.5 rounded-xl bg-gray-100 dark:bg-gray-700/50 text-gray-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-all"
+            class="p-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-all"
+            title="关闭"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
           </button>
         </div>
@@ -515,81 +536,10 @@ const goToPage = (page) => {
     </template>
 
     <template #body>
-
-      <!-- 统计信息 -->
-      <div v-if="!loading && !error && Object.keys(protocolStats).length > 0" class="shrink-0 border-b border-gray-100 bg-gray-50/30 px-4 py-2 dark:border-gray-800/50 dark:bg-gray-900/10 sm:px-6">
-        <!-- 桌面端统计布局 (Premium Cards) -->
-        <div class="hidden lg:grid grid-cols-4 gap-3">
-          <div class="group relative rounded-xl border border-gray-100 bg-white p-3 shadow-sm transition-all hover:shadow-md dark:border-white/5 dark:bg-white/5">
-             <div class="flex items-center gap-3">
-               <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400">
-                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
-               </div>
-               <div>
-                 <div class="text-xs font-bold text-gray-400 uppercase tracking-tighter dark:text-gray-500">Nodes Total</div>
-                 <div class="text-2xl font-black text-gray-900 dark:text-white">{{ allNodes.length }}</div>
-               </div>
-             </div>
-             <div class="absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-blue-500/10 transition-colors pointer-events-none"></div>
-          </div>
-          
-          <div class="group relative rounded-xl border border-gray-100 bg-white p-3 shadow-sm transition-all hover:shadow-md dark:border-white/5 dark:bg-white/5">
-             <div class="flex items-center gap-3">
-               <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-purple-50 text-purple-600 dark:bg-purple-500/10 dark:text-purple-400">
-                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-               </div>
-               <div>
-                 <div class="text-xs font-bold text-gray-400 uppercase tracking-tighter dark:text-gray-500">Protocols</div>
-                 <div class="text-2xl font-black text-gray-900 dark:text-white">{{ Object.keys(protocolStats).length }}</div>
-               </div>
-             </div>
-              <div class="absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-purple-500/10 transition-colors pointer-events-none"></div>
-          </div>
-
-          <div class="group relative rounded-xl border border-gray-100 bg-white p-3 shadow-sm transition-all hover:shadow-md dark:border-white/5 dark:bg-white/5">
-             <div class="flex items-center gap-3">
-               <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-50 text-orange-600 dark:bg-orange-500/10 dark:text-orange-400">
-                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-               </div>
-               <div>
-                 <div class="text-xs font-bold text-gray-400 uppercase tracking-tighter dark:text-gray-500">Regions</div>
-                 <div class="text-2xl font-black text-gray-900 dark:text-white">{{ Object.keys(regionStats).length }}</div>
-               </div>
-             </div>
-              <div class="absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-orange-500/10 transition-colors pointer-events-none"></div>
-          </div>
-
-          <div class="group relative rounded-xl border border-gray-100 bg-white p-3 shadow-sm transition-all hover:shadow-md dark:border-white/5 dark:bg-white/5">
-             <div class="flex items-center gap-3">
-               <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400">
-                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
-               </div>
-               <div>
-                 <div class="text-xs font-bold text-gray-400 uppercase tracking-tighter dark:text-gray-500">Total Pages</div>
-                 <div class="text-2xl font-black text-gray-900 dark:text-white">{{ totalPages }}</div>
-               </div>
-             </div>
-              <div class="absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-emerald-500/10 transition-colors pointer-events-none"></div>
-          </div>
-        </div>
-
-        <!-- 移动端统计布局 (Compact Cards) -->
-        <div class="grid grid-cols-2 gap-2 lg:hidden">
-            <div class="flex flex-col gap-0.5 rounded-xl bg-indigo-50/50 p-2.5 dark:bg-indigo-500/10">
-                <span class="text-[10px] font-bold text-indigo-400 uppercase tracking-wider">总节点数</span>
-                <span class="text-xl font-black text-indigo-600 dark:text-indigo-400">{{ allNodes.length }}</span>
-            </div>
-            <div class="flex flex-col gap-0.5 rounded-xl bg-purple-50/50 p-2.5 dark:bg-purple-500/10">
-                <span class="text-[10px] font-bold text-purple-400 uppercase tracking-wider">协议类型</span>
-                <span class="text-xl font-black text-purple-600 dark:text-purple-400">{{ Object.keys(protocolStats).length }}</span>
-            </div>
-        </div>
-      </div>
-
-      <!-- 筛选控件 - 统一响应式布局 -->
+      <!-- 筛选控件 - 紧凑单行工具栏 -->
       <NodeFilters
         v-if="!loading && !error && Object.keys(protocolStats).length > 0"
-        class="shrink-0 px-3 sm:px-5 py-1 sm:py-2 border-b border-gray-200 dark:border-gray-700"
+        class="shrink-0"
         :search-query="searchQuery"
         :protocol-filter="protocolFilter"
         :region-filter="regionFilter"
@@ -606,71 +556,69 @@ const goToPage = (page) => {
         @update:show-processed="showProcessed = $event"
       />
 
-      <!-- 节点列表 -->
-      <div class="min-h-0 flex-1 overflow-hidden bg-white dark:bg-gray-800" :class="{ 'pb-24 sm:pb-28': pickingMode }">
-        <div class="h-full overflow-y-auto px-2 py-1 sm:px-4 sm:py-2">
-          <!-- 加载状态 -->
-          <div v-if="loading" class="flex h-64 items-center justify-center">
-            <div class="rounded-xl border border-gray-200/70 bg-white px-8 py-8 text-center shadow-sm dark:border-white/10 dark:bg-white/5">
-              <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-              <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">正在加载节点信息...</p>
-            </div>
+      <!-- 节点列表容器 -->
+      <div class="min-h-0 flex-1 overflow-hidden flex flex-col bg-white dark:bg-gray-800" :class="{ 'pb-24 sm:pb-28': pickingMode }">
+        <!-- 加载状态 -->
+        <div v-if="loading" class="flex-1 flex items-center justify-center p-8">
+          <div class="rounded-xl border border-gray-200/70 bg-white px-8 py-8 text-center shadow-sm dark:border-white/10 dark:bg-white/5">
+            <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+            <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">正在加载节点信息...</p>
           </div>
+        </div>
 
-          <!-- 错误状态 -->
-          <div v-else-if="error" class="flex h-64 items-center justify-center">
-            <div class="rounded-xl border border-red-200/70 bg-red-50/80 px-8 py-8 text-center shadow-sm dark:border-red-500/20 dark:bg-red-500/10">
-              <svg class="mx-auto h-12 w-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-              </svg>
-              <p class="mt-4 text-sm text-red-600 dark:text-red-400">{{ error }}</p>
-              <button
-                @click="loadNodes"
-                class="mt-3 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-700"
-              >
-                重试
-              </button>
-            </div>
+        <!-- 错误状态 -->
+        <div v-else-if="error" class="flex-1 flex items-center justify-center p-8">
+          <div class="rounded-xl border border-red-200/70 bg-red-50/80 px-8 py-8 text-center shadow-sm dark:border-red-500/20 dark:bg-red-500/10">
+            <svg class="mx-auto h-12 w-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+            <p class="mt-4 text-sm text-red-600 dark:text-red-400">{{ error }}</p>
+            <button
+              @click="loadNodes"
+              class="mt-3 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-700"
+            >
+              重试
+            </button>
           </div>
+        </div>
 
-          <!-- 无数据状态 -->
-          <div v-else-if="paginatedNodes.length === 0" class="flex h-64 items-center justify-center">
-            <div class="rounded-xl border border-dashed border-gray-300 bg-white/70 px-8 py-8 text-center dark:border-gray-700 dark:bg-gray-900/50">
-              <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-              </svg>
-              <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">未找到符合条件的节点</p>
-            </div>
+        <!-- 无数据状态 -->
+        <div v-else-if="paginatedNodes.length === 0" class="flex-1 flex items-center justify-center p-8">
+          <div class="rounded-xl border border-dashed border-gray-300 bg-white/70 px-8 py-8 text-center dark:border-gray-700 dark:bg-gray-900/50">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+            </svg>
+            <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">未找到符合条件的节点</p>
           </div>
+        </div>
 
-          <!-- 节点列表/卡片视图 -->
-          <div v-else class="flex h-full flex-col">
-            <!-- 简洁列表视图 (仅大屏桌面端) -->
-            <NodeList
-              v-if="effectiveViewMode === 'list'"
-              :nodes="paginatedNodes"
-              :copied-node-id="copiedNodeId"
-              :parse-node-info="parseNodeInfo"
-              :get-protocol-style="getProtocolStyle"
-              :selection-mode="pickingMode"
-              :selected-urls="selectedUrls"
-              @copy="copyNodeUrl"
-              @toggle-select="toggleNodeSelection"
-            />
+        <!-- 节点列表/卡片视图 -->
+        <div v-else class="flex-1 min-h-0 flex flex-col">
+          <!-- 简洁列表视图 (仅大屏桌面端) -->
+          <NodeList
+            v-if="effectiveViewMode === 'list'"
+            :nodes="paginatedNodes"
+            :copied-node-id="copiedNodeId"
+            :parse-node-info="parseNodeInfo"
+            :get-protocol-style="getProtocolStyle"
+            :selection-mode="pickingMode"
+            :selected-urls="selectedUrls"
+            @copy="copyNodeUrl"
+            @toggle-select="toggleNodeSelection"
+          />
 
-            <!-- 卡片视图 container -->
-            <NodeCard
-              v-else
-              :nodes="paginatedNodes"
-              :copied-node-id="copiedNodeId"
-              :parse-node-info="parseNodeInfo"
-              :get-protocol-style="getProtocolStyle"
-              :selection-mode="pickingMode"
-              :selected-urls="selectedUrls"
-              @copy="copyNodeUrl"
-              @toggle-select="toggleNodeSelection"
-            />
-          </div>
+          <!-- 卡片视图 container -->
+          <NodeCard
+            v-else
+            :nodes="paginatedNodes"
+            :copied-node-id="copiedNodeId"
+            :parse-node-info="parseNodeInfo"
+            :get-protocol-style="getProtocolStyle"
+            :selection-mode="pickingMode"
+            :selected-urls="selectedUrls"
+            @copy="copyNodeUrl"
+            @toggle-select="toggleNodeSelection"
+          />
         </div>
       </div>
 
