@@ -117,7 +117,7 @@ const customKeywordModel = computed({
         <!-- 可视化模式 -->
         <div v-if="!isAdvancedMode" class="space-y-3">
           <p class="text-xs text-gray-500 dark:text-gray-400">
-            优先级：关键词 ＞ 地区 ＞ 协议。命中后立即决定保留或排除；未命中继续判断下一类。
+            优先级：关键词 ＞ 地区 ＞ 协议。关键词命中时优先保留或排除；其余节点须同时满足地区和协议条件。
           </p>
           <div v-for="group in groups" :key="group.type" class="space-y-2">
             <div class="flex items-center justify-between gap-2">
@@ -187,7 +187,7 @@ const customKeywordModel = computed({
 
           <!-- 提示 -->
           <p class="text-xs text-gray-500 dark:text-gray-400">
-            自定义关键词也按关键词优先级处理。全部未命中时，最低已设置类别为包含则排除，否则保留。
+            包含 GB + 包含美国 + 包含 AnyTLS：保留所有含 GB 的节点，以及美国的 AnyTLS 节点。自定义关键词同样优先处理。
           </p>
         </div>
 

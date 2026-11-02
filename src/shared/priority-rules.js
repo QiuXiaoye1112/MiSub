@@ -53,14 +53,18 @@ export function compilePriorityFilter(text) {
             : group.patterns.map(pattern => new RegExp(pattern, 'i'));
         return { category, mode: group.mode, patterns };
     });
+    const matches = (group, node) => group.category === 'protocol'
+        ? group.patterns.has((node.protocol || '').toLowerCase())
+        : group.patterns.some(regex => regex.test(node.name || '') || (group.category === 'region' && regex.test(node.region || '')));
+    const keyword = ordered.find(group => group.category === 'keyword');
+    const constraints = ordered.filter(group => group.category !== 'keyword');
     return node => {
-        for (const group of ordered) {
-            const hit = group.category === 'protocol'
-                ? group.patterns.has((node.protocol || '').toLowerCase())
-                : group.patterns.some(regex => regex.test(node.name || '') || (group.category === 'region' && regex.test(node.region || '')));
-            if (hit) return group.mode === 'keep';
-        }
-        // The lowest configured category defines the fallback: whitelist denies, blacklist allows.
-        return ordered.at(-1)?.mode !== 'keep';
+        // Keywords are explicit exceptions. Region and protocol remain cumulative constraints.
+        if (keyword && matches(keyword, node)) return keyword.mode === 'keep';
+        if (!constraints.length) return keyword?.mode !== 'keep';
+        return constraints.every(group => {
+            const hit = matches(group, node);
+            return group.mode === 'keep' ? hit : !hit;
+        });
     };
 }

@@ -19,7 +19,7 @@ describe('category priority rules', () => {
         expect(filter('protocol:exclude:trojan\nregion:exclude:US\nkeyword:keep:GB')).toEqual(['US 100 GB', 'HK 50 GB', 'HK AnyTLS']);
     });
     it('lets keyword exclusions override region and protocol inclusions', () => {
-        expect(filter('keyword:exclude:GB\nregion:keep:US\nprotocol:keep:trojan')).toEqual(['US ordinary', 'HK ordinary', 'US AnyTLS']);
+        expect(filter('keyword:exclude:GB\nregion:keep:US\nprotocol:keep:trojan')).toEqual(['US ordinary']);
     });
     it('lets region exclusions override protocol inclusion', () => {
         expect(filter('region:exclude:US\nprotocol:keep:trojan')).toEqual(['HK 50 GB', 'HK ordinary']);
@@ -35,6 +35,22 @@ describe('category priority rules', () => {
         const match = compilePriorityFilter('region:exclude:香港\nprotocol:keep:ss');
         expect(match({ protocol: 'shadowsocks', name: 'a', region: '香港' })).toBe(false);
         expect(match({ protocol: 'shadowsocks', name: 'b', region: '美国' })).toBe(true);
+    });
+    it('keeps GB exceptions plus only US AnyTLS nodes', () => {
+        expect(filter('keyword:keep:GB\nregion:keep:US\nprotocol:keep:anytls')).toEqual(['US 100 GB', 'HK 50 GB', 'US AnyTLS']);
+    });
+    it('requires both region and protocol inclusion without a keyword exception', () => {
+        expect(filter('region:keep:US\nprotocol:keep:anytls')).toEqual(['US AnyTLS']);
+    });
+    it('applies protocol exclusion even when region inclusion matches', () => {
+        expect(filter('region:keep:US\nprotocol:exclude:trojan')).toEqual(['US AnyTLS']);
+    });
+    it('uses country-only and protocol-only inclusion as whitelists', () => {
+        expect(filter('region:keep:US')).toEqual(['US 100 GB', 'US ordinary', 'US AnyTLS']);
+        expect(filter('protocol:keep:anytls')).toEqual(['US AnyTLS', 'HK AnyTLS']);
+    });
+    it('still requires region inclusion when the excluded protocol does not match', () => {
+        expect(filter('region:keep:US\nprotocol:exclude:vmess')).toEqual(['US 100 GB', 'US ordinary', 'US AnyTLS']);
     });
     it('round-trips category modes and custom keyword patterns', () => {
         const text = serializePriorityRules([{ type: 'custom', pattern: 'GB' }, { type: 'protocol', pattern: 'proto:trojan' }], { keyword: 'keep', protocol: 'exclude' });
