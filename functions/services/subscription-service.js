@@ -725,7 +725,22 @@ function buildRuleSet(lines, stripKeepPrefix = false) {
                 .split(',')
                 .map(p => p.trim().toLowerCase())
                 .filter(Boolean);
-            parts.forEach(p => protocols.add(p));
+            parts.forEach(p => {
+                protocols.add(p);
+                if (p === 'hysteria') {
+                    protocols.add('hysteria2');
+                    protocols.add('hy2');
+                } else if (p === 'hysteria2') {
+                    protocols.add('hysteria');
+                    protocols.add('hy2');
+                } else if (p === 'ss') {
+                    protocols.add('shadowsocks');
+                } else if (p === 'shadowsocks') {
+                    protocols.add('ss');
+                } else if (p === 'socks5') {
+                    protocols.add('socks');
+                }
+            });
             continue;
         }
 

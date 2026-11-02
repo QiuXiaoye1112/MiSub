@@ -60,23 +60,24 @@ describe('Node Cleaner Utils', () => {
             { protocol: 'vmess', name: 'US Node 1' },
             { protocol: 'ss', name: 'HK Node 2' },
             { protocol: 'trojan', name: 'JP Node 3' },
-            { protocol: 'vless', name: 'US Premium' }
+            { protocol: 'vless', name: 'US Premium' },
+            { protocol: 'anytls', name: 'AnyTLS Node 1' }
         ];
 
         it('should filter by protocol (include)', () => {
-            const ruleText = 'proto:vmess,ss';
+            const ruleText = 'proto:vmess,ss,anytls';
             const rules = buildRuleSet(ruleText);
             const result = filterNodeObjects(nodes, rules, 'include');
-            expect(result).toHaveLength(2);
-            expect(result.map(n => n.protocol)).toEqual(expect.arrayContaining(['vmess', 'ss']));
+            expect(result).toHaveLength(3);
+            expect(result.map(n => n.protocol)).toEqual(expect.arrayContaining(['vmess', 'ss', 'anytls']));
         });
 
         it('should filter by name regex (exclude)', () => {
             const ruleText = 'US'; // Regex partial match
             const rules = buildRuleSet(ruleText);
             const result = filterNodeObjects(nodes, rules, 'exclude');
-            // Should exclude 'US Node 1' and 'US Premium'
-            expect(result).toHaveLength(2);
+            // Should exclude 'US Node 1' and 'US Premium', leaving 3 nodes
+            expect(result).toHaveLength(3);
             expect(result.find(n => n.name.includes('US'))).toBeUndefined();
         });
 

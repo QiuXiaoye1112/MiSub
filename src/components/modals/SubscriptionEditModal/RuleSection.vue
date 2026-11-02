@@ -234,7 +234,7 @@ const customKeywordModel = computed({
             }}</span>
           </div>
           <textarea id="sub-edit-exclude" v-model="editingSubscription.exclude"
-            placeholder="[排除模式(默认)]&#10;proto:vless,trojan&#10;(过期|官网)&#10;---&#10;[包含模式(只保留匹配项)]&#10;keep:(香港|HK)&#10;keep:proto:ss"
+            placeholder="[排除模式(默认)]&#10;proto:vless,trojan,anytls&#10;(过期|官网)&#10;---&#10;[包含模式(只保留匹配项)]&#10;keep:(香港|HK)&#10;keep:proto:anytls"
             rows="8" :class="[
               'w-full px-3 py-2 misub-radius-md sm:text-sm font-mono dark:text-white leading-6 resize-none bg-white dark:bg-gray-800',
               excludeRuleState.errors.length

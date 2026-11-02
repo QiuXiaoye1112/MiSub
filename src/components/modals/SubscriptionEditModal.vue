@@ -39,6 +39,9 @@ const presetProtocols = [
   { label: 'VLESS', pattern: 'proto:vless' },
   { label: 'Trojan', pattern: 'proto:trojan' },
   { label: 'Hysteria', pattern: 'proto:hysteria' },
+  { label: 'AnyTLS', pattern: 'proto:anytls' },
+  { label: 'TUIC', pattern: 'proto:tuic' },
+  { label: 'WireGuard', pattern: 'proto:wireguard' },
 ];
 
 const presetKeywords = [
