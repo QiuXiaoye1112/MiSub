@@ -5,6 +5,7 @@ import { fetchSubscriptionNodes } from '../../functions/modules/subscription/nod
 const fixtures = [
     ['hysteria2', 'US Hysteria'],
     ['hysteria2', 'HK Hysteria'],
+    ['hysteria2', 'HK 100 GB'],
     ['trojan', 'US Trojan'],
     ['trojan', 'HK Trojan']
 ];
@@ -15,13 +16,17 @@ afterEach(() => vi.unstubAllGlobals());
 
 describe('protocol and country filter combinations', () => {
     it.each([
+        ['keyword:keep:GB\nprotocol:exclude:hysteria', ['HK 100 GB', 'US Trojan', 'HK Trojan']],
+        ['keyword:keep:GB\nregion:exclude:HK\nprotocol:exclude:hysteria', ['HK 100 GB', 'US Trojan']],
+        ['keyword:exclude:GB\nregion:keep:US\nprotocol:keep:hysteria', ['US Hysteria', 'HK Hysteria', 'US Trojan']],
+        ['protocol:keep:hysteria\nregion:exclude:HK', ['US Hysteria']],
         ['keep:proto:hysteria\nkeep:(美国|US|USA)', ['US Hysteria']],
-        ['keep:proto:hysteria', ['US Hysteria', 'HK Hysteria']],
+        ['keep:proto:hysteria', ['US Hysteria', 'HK Hysteria', 'HK 100 GB']],
         ['keep:(美国|US|USA)', ['US Hysteria', 'US Trojan']],
         ['proto:hysteria\n(美国|US|USA)', ['HK Trojan']],
         ['(香港|HK)\n---\nkeep:proto:hysteria\nkeep:(美国|US|USA)', ['US Hysteria']],
         ['keep:proto:hysteria,trojan\nkeep:(美国|US|USA)', ['US Hysteria', 'US Trojan']],
-        ['keep:proto:hysteria\nkeep:(美国|US|USA)\nkeep:(香港|HK)', ['US Hysteria', 'HK Hysteria']]
+        ['keep:proto:hysteria\nkeep:(美国|US|USA)\nkeep:(香港|HK)', ['US Hysteria', 'HK Hysteria', 'HK 100 GB']]
     ])('applies %s consistently to preview and subscription output', async (exclude, expected) => {
         vi.stubGlobal('fetch', vi.fn(async () => new Response(source, { status: 200 })));
         const preview = await fetchSubscriptionNodes('https://airport.example/sub', 'Fixture', 'ClashMeta', null, false, exclude);

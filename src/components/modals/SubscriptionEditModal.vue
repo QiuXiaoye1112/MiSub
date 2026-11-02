@@ -1,5 +1,6 @@
 <script setup>
 import { computed, ref, watch } from 'vue';
+import { parsePriorityRules, serializePriorityRules } from '../../shared/priority-rules.js';
 import { useToastStore } from '../../stores/toast.js';
 import Modal from '../forms/Modal.vue';
 import EditForm from './SubscriptionEditModal/EditForm.vue';
@@ -18,7 +19,7 @@ const { showToast } = useToastStore();
 // === 可视化规则编辑器 ===
 const isAdvancedMode = ref(false);
 const isRuleExpanded = ref(false); // 折叠状态
-const ruleMode = ref('exclude'); // 'exclude' | 'keep'
+const groupModes = ref({ keyword: 'exclude', region: 'exclude', protocol: 'exclude' });
 const customKeyword = ref('');
 
 // 预设标签
@@ -79,6 +80,13 @@ const addCustomKeyword = () => {
   const keyword = customKeyword.value.trim();
   if (!keyword) return;
 
+  try {
+    new RegExp(keyword, 'i');
+  } catch {
+    showToast('关键字正则无效，请检查后重试', 'error');
+    return;
+  }
+
   // 检查是否已存在
   if (selectedRules.value.some(rule => rule.pattern === keyword || rule.label === keyword)) {
     showToast('该关键字已添加', 'warning');
@@ -104,77 +112,67 @@ const removeRule = (index) => {
 const syncToText = () => {
   if (!props.editingSubscription) return;
 
-  const rules = selectedRules.value.map(rule => {
-    if (ruleMode.value === 'keep') {
-      return rule.pattern.startsWith('proto:')
-        ? `keep:${rule.pattern}`
-        : `keep:${rule.pattern}`;
-    }
-    return rule.pattern;
-  });
-
-  props.editingSubscription.exclude = rules.join('\n');
+  props.editingSubscription.exclude = serializePriorityRules(selectedRules.value, groupModes.value);
 };
 
 // 从文本解析到可视化状态
 const parseFromText = () => {
-  if (!props.editingSubscription?.exclude) {
-    selectedRules.value = [];
-    ruleMode.value = 'exclude';
+  const text = props.editingSubscription?.exclude || '';
+  selectedRules.value = [];
+  groupModes.value = { keyword: 'exclude', region: 'exclude', protocol: 'exclude' };
+  const allPresets = [...presetRegions, ...presetProtocols, ...presetKeywords];
+  const addRule = (pattern, category) => {
+    const preset = allPresets.find(p => p.pattern === pattern);
+    selectedRules.value.push({ ...(preset || { label: pattern.replace(/^proto:/i, ''), pattern }), type: category });
+  };
+  try {
+    const priority = parsePriorityRules(text);
+    if (priority) {
+      for (const [category, group] of Object.entries(priority)) {
+        groupModes.value[category] = group.mode;
+        group.patterns.forEach(pattern => addRule(category === 'protocol' ? `proto:${pattern}` : pattern, category));
+      }
+      return;
+    }
+  } catch {
+    isAdvancedMode.value = true;
     return;
   }
-
-  const text = props.editingSubscription.exclude;
-  const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
-
-  // 检测模式
-  const hasKeep = lines.some(l => l.toLowerCase().startsWith('keep:'));
-  ruleMode.value = hasKeep ? 'keep' : 'exclude';
-
-  // 如果包含 --- 分隔符或复杂混合规则，使用高级模式
+  const lines = text.split('\n').map(line => line.trim()).filter(Boolean);
+  // Keep complex legacy rules in advanced mode until the user edits them explicitly.
   if (lines.includes('---')) {
     isAdvancedMode.value = true;
     return;
   }
-
-  selectedRules.value = [];
-
-  lines.forEach(line => {
-    let pattern = line;
-    if (pattern.toLowerCase().startsWith('keep:')) {
-      pattern = pattern.substring(5).trim();
+  const modes = {};
+  for (const line of lines) {
+    const keep = /^keep:/i.test(line);
+    const pattern = keep ? line.substring(5).trim() : line;
+    const category = /^proto:/i.test(pattern) ? 'protocol'
+      : presetRegions.some(p => p.pattern === pattern) ? 'region' : 'keyword';
+    const mode = keep ? 'keep' : 'exclude';
+    if (modes[category] && modes[category] !== mode) {
+      isAdvancedMode.value = true;
+      return;
     }
-
-    // 尝试匹配预设标签
-    const allPresets = [...presetRegions, ...presetProtocols, ...presetKeywords];
-    const preset = allPresets.find(p => p.pattern === pattern);
-
-    if (preset) {
-      const type = presetRegions.includes(preset) ? 'region'
-        : presetProtocols.includes(preset) ? 'protocol' : 'keyword';
-      selectedRules.value.push({ ...preset, type });
-    } else {
-      // 作为自定义关键字
-      selectedRules.value.push({
-        label: pattern,
-        pattern: pattern,
-        type: 'custom'
-      });
-    }
-  });
+    modes[category] = mode;
+    groupModes.value[category] = mode;
+    addRule(pattern, category);
+  }
 };
 
-// 切换模式时更新文本
-watch(ruleMode, () => {
+const setGroupMode = (category, mode) => {
+  groupModes.value[category] = mode;
   syncToText();
-});
+};
 
 // 监听弹窗显示，解析现有规则
 watch(() => props.show, (newVal) => {
   if (newVal) {
+    isAdvancedMode.value = false;
     parseFromText();
   }
-});
+}, { immediate: true });
 
 // === 高级模式相关（保留原有逻辑） ===
 const excludeRuleTextarea = ref(null);
@@ -194,6 +192,14 @@ const excludeRuleState = computed(() => {
   const dividerIndex = lines.findIndex(line => line === '---');
   const hasDivider = dividerIndex !== -1;
   const hasKeepPrefix = lines.some(line => line.toLowerCase().startsWith('keep:'));
+
+  try {
+    if (parsePriorityRules(text)) return {
+      tag: '优先级', tagClass: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-200', errors: [], errorsText: ''
+    };
+  } catch (error) {
+    return { tag: '规则有误', tagClass: 'text-red-600', errors: [{ line: 1, message: error.message }], errorsText: error.message };
+  }
 
   let tag = '未设置';
   if (hasContent) {
@@ -262,7 +268,8 @@ const syncExcludeRuleScroll = () => {
 
 
 const handleConfirm = () => {
-  if (isAdvancedMode.value && excludeRuleState.value.errors.length > 0) {
+  if (!isAdvancedMode.value) syncToText();
+  if (excludeRuleState.value.errors.length > 0) {
     showToast('包含/排除规则有误，请先修正', 'error');
     return;
   }
@@ -283,7 +290,7 @@ const switchToVisual = () => {
 
 <template>
   <Modal v-if="editingSubscription" :show="show" size="2xl"
-    :confirm-disabled="isAdvancedMode && excludeRuleState.errors.length > 0" confirm-button-title="请先修正规则"
+    :confirm-disabled="excludeRuleState.errors.length > 0" confirm-button-title="请先修正规则"
     @update:show="emit('update:show', $event)" @confirm="handleConfirm">
     <template #title>
       <div class="flex items-center gap-3">
@@ -309,7 +316,7 @@ const switchToVisual = () => {
           :editing-subscription="editingSubscription"
           :is-rule-expanded="isRuleExpanded"
           :is-advanced-mode="isAdvancedMode"
-          :rule-mode="ruleMode"
+          :group-modes="groupModes"
           :custom-keyword="customKeyword"
           :selected-rules="selectedRules"
           :preset-regions="presetRegions"
@@ -323,7 +330,7 @@ const switchToVisual = () => {
           :switch-to-advanced="switchToAdvanced"
           :switch-to-visual="switchToVisual"
           @toggle-expand="isRuleExpanded = !isRuleExpanded"
-          @update:rule-mode="ruleMode = $event"
+          @update:group-mode="setGroupMode"
           @update:custom-keyword="customKeyword = $event"
         />
 

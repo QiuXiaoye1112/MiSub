@@ -1,3 +1,4 @@
+import { compilePriorityFilter } from '../../src/shared/priority-rules.js';
 /**
  * 订阅处理服务
  * @author MiSub Team
@@ -650,6 +651,8 @@ function applyManualNodeName(nodeUrl, customName) {
 function applyFilterRules(validNodes, sub) {
     const ruleText = sub.exclude;
     if (!ruleText || ruleText.trim() === '') return validNodes;
+    const priorityFilter = compilePriorityFilter(ruleText);
+    if (priorityFilter) return validNodes.filter(link => priorityFilter(parseNodeInfo(link)));
 
     const lines = ruleText
         .split('\n')

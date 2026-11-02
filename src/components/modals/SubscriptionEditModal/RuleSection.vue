@@ -14,9 +14,9 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
-  ruleMode: {
-    type: String,
-    default: 'exclude'
+  groupModes: {
+    type: Object,
+    default: () => ({ keyword: 'exclude', region: 'exclude', protocol: 'exclude' })
   },
   customKeyword: {
     type: String,
@@ -68,12 +68,13 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['toggle-expand', 'update:ruleMode', 'update:customKeyword']);
+const emit = defineEmits(['toggle-expand', 'update:group-mode', 'update:customKeyword']);
 
-const ruleModeModel = computed({
-  get: () => props.ruleMode,
-  set: (val) => emit('update:ruleMode', val)
-});
+const groups = computed(() => [
+  { type: 'keyword', label: '🏷️ 关键词', name: '关键词', priority: 1, tags: props.presetKeywords },
+  { type: 'region', label: '📍 地区', name: '地区', priority: 2, tags: props.presetRegions },
+  { type: 'protocol', label: '📡 协议', name: '协议', priority: 3, tags: props.presetProtocols }
+]);
 
 const customKeywordModel = computed({
   get: () => props.customKeyword,
@@ -115,69 +116,34 @@ const customKeywordModel = computed({
       <div v-show="isRuleExpanded" class="px-4 py-3 border-t border-gray-200 dark:border-gray-700">
         <!-- 可视化模式 -->
         <div v-if="!isAdvancedMode" class="space-y-3">
-          <!-- 模式选择 -->
-          <div class="flex gap-2">
-            <button @click="ruleModeModel = 'exclude'" :class="[
-              'flex-1 sm:flex-none px-3 py-1.5 text-xs sm:text-sm font-medium misub-radius-md transition-all !min-h-0 !min-w-0',
-              ruleModeModel === 'exclude'
-                ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-200'
-                : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-            ]">
-              排除模式
-            </button>
-            <button @click="ruleModeModel = 'keep'" :class="[
-              'flex-1 sm:flex-none px-3 py-1.5 text-xs sm:text-sm font-medium misub-radius-md transition-all !min-h-0 !min-w-0',
-              ruleModeModel === 'keep'
-                ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-200'
-                : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-            ]">
-              仅包含模式
-            </button>
-          </div>
-
-          <!-- 地区标签 -->
-          <div>
-            <div class="text-xs text-gray-500 dark:text-gray-400 mb-1.5">📍 地区</div>
-            <div class="flex flex-wrap gap-1.5">
-              <button v-for="tag in presetRegions" :key="tag.pattern" @click="toggleTag(tag, 'region')" :class="[
-                'px-2.5 py-1 text-xs sm:text-sm font-medium misub-radius-md transition-all !min-h-0 !min-w-0',
-                isSelected(tag.pattern)
-                  ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-200 ring-1 ring-indigo-300 dark:ring-indigo-700'
-                  : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-              ]">
-                {{ tag.icon }} {{ tag.label }}
-              </button>
+          <p class="text-xs text-gray-500 dark:text-gray-400">
+            优先级：关键词 ＞ 地区 ＞ 协议。命中后立即决定保留或排除；未命中继续判断下一类。
+          </p>
+          <div v-for="group in groups" :key="group.type" class="space-y-2">
+            <div class="flex items-center justify-between gap-2">
+              <div class="text-xs text-gray-500 dark:text-gray-400">{{ group.label }} · 优先级 {{ group.priority }}</div>
+              <div class="flex gap-1">
+                <button v-for="mode in ['exclude', 'keep']" :key="mode" type="button"
+                  :aria-label="`${group.name}${mode === 'keep' ? '包含' : '排除'}`"
+                  :aria-pressed="groupModes[group.type] === mode"
+                  @click="emit('update:group-mode', group.type, mode)"
+                  :class="[
+                    'px-2.5 py-1 text-xs misub-radius-md transition-colors !min-h-0',
+                    groupModes[group.type] === mode
+                      ? mode === 'keep' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-200' : 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-200'
+                      : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
+                  ]">{{ mode === 'keep' ? '包含' : '排除' }}</button>
+              </div>
             </div>
-          </div>
-
-          <!-- 协议标签 -->
-          <div>
-            <div class="text-xs text-gray-500 dark:text-gray-400 mb-1.5">📡 协议</div>
             <div class="flex flex-wrap gap-1.5">
-              <button v-for="tag in presetProtocols" :key="tag.pattern" @click="toggleTag(tag, 'protocol')"
+              <button v-for="tag in group.tags" :key="tag.pattern" type="button" @click="toggleTag(tag, group.type)"
+                :aria-pressed="isSelected(tag.pattern)"
                 :class="[
                   'px-2.5 py-1 text-xs sm:text-sm font-medium misub-radius-md transition-all !min-h-0 !min-w-0',
                   isSelected(tag.pattern)
                     ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-200 ring-1 ring-indigo-300 dark:ring-indigo-700'
                     : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                ]">
-                {{ tag.label }}
-              </button>
-            </div>
-          </div>
-
-          <!-- 关键词标签 -->
-          <div>
-            <div class="text-xs text-gray-500 dark:text-gray-400 mb-1.5">🏷️ 关键词</div>
-            <div class="flex flex-wrap gap-1.5">
-              <button v-for="tag in presetKeywords" :key="tag.pattern" @click="toggleTag(tag, 'keyword')" :class="[
-                'px-2.5 py-1 text-xs sm:text-sm font-medium misub-radius-md transition-all !min-h-0 !min-w-0',
-                isSelected(tag.pattern)
-                  ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-200 ring-1 ring-indigo-300 dark:ring-indigo-700'
-                  : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-              ]">
-                {{ tag.label }}
-              </button>
+                ]">{{ tag.icon }} {{ tag.label }}</button>
             </div>
           </div>
 
@@ -198,9 +164,7 @@ const customKeywordModel = computed({
           <div v-if="selectedRules.length > 0">
             <div class="text-xs text-gray-500 dark:text-gray-400 mb-1.5">
               📋 已选规则 ({{ selectedRules.length }})
-              <span class="ml-1" :class="ruleModeModel === 'keep' ? 'text-emerald-600' : 'text-amber-600'">
-                - {{ ruleModeModel === 'keep' ? '仅保留匹配项' : '排除匹配项' }}
-              </span>
+
             </div>
             <div class="flex flex-wrap gap-1.5 p-2 bg-gray-50 dark:bg-gray-800/50 misub-radius-md">
               <span v-for="(rule, index) in selectedRules" :key="index" :class="[
@@ -210,7 +174,7 @@ const customKeywordModel = computed({
                     rule.type === 'custom' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-200' :
                       'bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200'
               ]">
-                {{ rule.icon || '' }}{{ rule.label }}
+                {{ rule.icon || '' }}{{ rule.label }} · {{ groupModes[rule.type === 'custom' ? 'keyword' : rule.type] === 'keep' ? '包含' : '排除' }}
                 <button @click="removeRule(index)" class="hover:text-red-500 transition-colors !min-h-0 !min-w-0">
                   <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -223,7 +187,7 @@ const customKeywordModel = computed({
 
           <!-- 提示 -->
           <p class="text-xs text-gray-500 dark:text-gray-400">
-            {{ ruleModeModel === 'keep' ? '选择协议和地区/关键词时，节点须同时满足两类条件；同类规则匹配任意一项即可' : '命中任一所选协议、地区或关键词的节点都会被排除' }}
+            自定义关键词也按关键词优先级处理。全部未命中时，最低已设置类别为包含则排除，否则保留。
           </p>
         </div>
 
@@ -234,7 +198,7 @@ const customKeywordModel = computed({
             }}</span>
           </div>
           <textarea id="sub-edit-exclude" v-model="editingSubscription.exclude"
-            placeholder="[排除模式(默认)]&#10;proto:vless,trojan,anytls&#10;(过期|官网)&#10;---&#10;[包含模式(只保留匹配项)]&#10;keep:(香港|HK)&#10;keep:proto:anytls"
+            placeholder="keyword:keep:GB&#10;region:exclude:(美国|US|USA)&#10;protocol:exclude:trojan"
             rows="8" :class="[
               'w-full px-3 py-2 misub-radius-md sm:text-sm font-mono dark:text-white leading-6 resize-none bg-white dark:bg-gray-800',
               excludeRuleState.errors.length
@@ -247,7 +211,7 @@ const customKeywordModel = computed({
           <div class="mt-2 text-xs text-gray-500 dark:text-gray-400 space-y-1">
             <p>每行一条规则，支持正则表达式。<code class="font-mono">proto:</code> 用于协议匹配。</p>
             <p><code class="font-mono">keep:</code> 表示仅保留匹配项，<code class="font-mono">---</code> 分隔排除和包含规则。</p>
-            <p>包含规则中，协议与地区/关键词须同时匹配；排除规则命中任意一项即排除。</p>
+            <p>优先级规则：<code>keyword:keep:GB</code>、<code>region:exclude:US</code>、<code>protocol:exclude:trojan</code>。keep 表示包含，exclude 表示排除；同一类别模式须一致，不能混用旧规则。</p>
           </div>
         </div>
       </div>

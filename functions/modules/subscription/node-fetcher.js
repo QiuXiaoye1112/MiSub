@@ -1,3 +1,4 @@
+import { compilePriorityFilter } from '../../../src/shared/priority-rules.js';
 import { parseNodeList } from '../utils/node-parser.js';
 import { fetchWithRetry } from '../../services/fetch-utils.js';
 import { buildFetchProxyUrl } from '../../utils/fetch-proxy-utils.js';
@@ -96,6 +97,8 @@ export async function fetchSubscriptionNodes(url, subscriptionName, userAgent, c
  */
 function applyExcludeRulesToNodes(nodes, ruleText) {
     if (!ruleText || !ruleText.trim()) return nodes;
+    const priorityFilter = compilePriorityFilter(ruleText);
+    if (priorityFilter) return nodes.filter(priorityFilter);
     const lines = ruleText
         .split('\n')
         .map(line => line.trim())
