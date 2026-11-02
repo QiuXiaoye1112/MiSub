@@ -70,10 +70,11 @@ const props = defineProps({
 
 const emit = defineEmits(['toggle-expand', 'update:group-mode', 'update:customKeyword']);
 
+// 顺序调整：地区最上面，其次协议，然后关键词
 const groups = computed(() => [
-  { type: 'keyword', label: '🏷️ 关键词', name: '关键词', priority: 1, tags: props.presetKeywords },
-  { type: 'region', label: '📍 地区', name: '地区', priority: 2, tags: props.presetRegions },
-  { type: 'protocol', label: '📡 协议', name: '协议', priority: 3, tags: props.presetProtocols }
+  { type: 'region', label: '📍 地区', name: '地区', tags: props.presetRegions },
+  { type: 'protocol', label: '📡 协议', name: '协议', tags: props.presetProtocols },
+  { type: 'keyword', label: '🏷️ 关键词', name: '关键词', tags: props.presetKeywords }
 ]);
 
 const customKeywordModel = computed({
@@ -119,7 +120,7 @@ const ruleSummary = computed(() => {
     }
   }
 
-  return parts.join('；') + '。自定义关键词同样按第一优先级处理。';
+  return parts.join('；') + '。自定义关键词同样优先处理。';
 });
 </script>
 
@@ -162,7 +163,7 @@ const ruleSummary = computed(() => {
     <Transition name="collapse">
       <div v-show="isRuleExpanded" class="px-4 py-3.5 border-t border-gray-200/90 dark:border-gray-700/80 bg-white/60 dark:bg-gray-800/20">
         <!-- 可视化模式 -->
-        <div v-if="!isAdvancedMode" class="space-y-3.5">
+        <div v-if="!isAdvancedMode" class="space-y-3">
           <!-- 优先级导览说明 -->
           <div class="p-2.5 rounded-lg bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-100/80 dark:border-indigo-900/50 flex items-start gap-2.5 text-xs text-indigo-950 dark:text-indigo-200/90 leading-relaxed">
             <div class="mt-0.5 flex-shrink-0 text-indigo-500 dark:text-indigo-400">
@@ -171,15 +172,8 @@ const ruleSummary = computed(() => {
               </svg>
             </div>
             <div class="flex-1 space-y-0.5">
-              <div class="flex items-center gap-1.5 font-semibold text-indigo-900 dark:text-indigo-200 flex-wrap">
-                <span>优先级：关键词 ＞ 地区 ＞ 协议。</span>
-                <span class="inline-flex items-center gap-1 font-mono text-[11px]">
-                  <span class="px-1.5 py-0.2 rounded bg-indigo-200/60 dark:bg-indigo-900/80 text-indigo-800 dark:text-indigo-200">P1 关键词</span>
-                  <span class="text-indigo-400">➔</span>
-                  <span class="px-1.5 py-0.2 rounded bg-indigo-200/60 dark:bg-indigo-900/80 text-indigo-800 dark:text-indigo-200">P2 地区</span>
-                  <span class="text-indigo-400">➔</span>
-                  <span class="px-1.5 py-0.2 rounded bg-indigo-200/60 dark:bg-indigo-900/80 text-indigo-800 dark:text-indigo-200">P3 协议</span>
-                </span>
+              <div class="font-semibold text-indigo-900 dark:text-indigo-200">
+                优先级：关键词 ＞ 地区 = 协议
               </div>
               <p class="text-indigo-700/90 dark:text-indigo-300/80 text-[11px]">
                 关键词命中时优先保留或排除；其余节点须同时满足地区和协议条件。
@@ -187,16 +181,13 @@ const ruleSummary = computed(() => {
             </div>
           </div>
 
-          <!-- 3 个优先级分类卡片 -->
+          <!-- 分类卡片列表（地区 -> 协议 -> 关键词） -->
           <div v-for="group in groups" :key="group.type"
-            class="border border-gray-100 dark:border-gray-700/60 bg-gray-50/50 dark:bg-gray-800/30 rounded-xl p-3 space-y-2.5 transition-colors hover:border-gray-200 dark:hover:border-gray-700">
+            class="border border-gray-100 dark:border-gray-700/60 bg-gray-50/50 dark:bg-gray-800/30 rounded-xl p-2.5 space-y-2 transition-colors hover:border-gray-200 dark:hover:border-gray-700">
             <!-- 分组标题 & 包含/排除分段控制器 -->
-            <div class="flex items-center justify-between gap-2 flex-wrap">
-              <div class="flex items-center gap-2">
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex items-center gap-1.5">
                 <span class="text-xs font-semibold text-gray-800 dark:text-gray-200">{{ group.label }}</span>
-                <span class="text-[10px] font-mono px-1.5 py-0.2 rounded-full font-medium bg-gray-200/70 text-gray-600 dark:bg-gray-700/70 dark:text-gray-300 border border-gray-300/40 dark:border-gray-600/50">
-                  优先级 {{ group.priority }}
-                </span>
               </div>
               <!-- 现代分段切换器 (Segmented Switch) -->
               <div class="inline-flex p-0.5 rounded-lg bg-gray-200/70 dark:bg-gray-800 border border-gray-300/40 dark:border-gray-700/60 shadow-2xs">
@@ -215,34 +206,30 @@ const ruleSummary = computed(() => {
               </div>
             </div>
 
-            <!-- 标签列表 -->
-            <div class="flex flex-wrap gap-1.5">
+            <!-- 标签列表：紧凑间距，确保单行排布 -->
+            <div class="flex flex-wrap items-center gap-1 sm:gap-1.5">
               <button v-for="tag in group.tags" :key="tag.pattern" type="button"
                 @click="toggleTag(tag, group.type)"
                 :aria-pressed="isSelected(tag.pattern)"
                 :class="[
-                  'inline-flex items-center gap-1 px-2.5 py-1 text-xs sm:text-sm font-medium rounded-lg transition-all duration-150 cursor-pointer select-none active:scale-95 !min-h-0 !min-w-0',
+                  'inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-lg transition-all duration-150 cursor-pointer select-none active:scale-95 !min-h-0 !min-w-0 flex-shrink-0',
                   isSelected(tag.pattern)
                     ? groupModes[group.type] === 'keep'
-                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-300 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-700 shadow-2xs font-semibold'
-                      : 'bg-amber-50 text-amber-700 border border-amber-300 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-700 shadow-2xs font-semibold'
+                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-400 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-600 shadow-2xs font-semibold ring-1 ring-emerald-500/20'
+                      : 'bg-amber-50 text-amber-700 border border-amber-400 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-600 shadow-2xs font-semibold ring-1 ring-amber-500/20'
                     : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700/80 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600 shadow-2xs'
                 ]">
                 <span v-if="tag.icon">{{ tag.icon }}</span>
                 <span>{{ tag.label }}</span>
-                <span v-if="isSelected(tag.pattern)" class="ml-0.5 text-[10px] opacity-80">✓</span>
               </button>
             </div>
           </div>
 
-          <!-- 自定义关键字输入卡片 -->
-          <div class="border border-gray-100 dark:border-gray-700/60 bg-gray-50/50 dark:bg-gray-800/30 rounded-xl p-3 space-y-2">
+          <!-- 自定义关键字输入卡片（紧跟在关键词后面） -->
+          <div class="border border-gray-100 dark:border-gray-700/60 bg-gray-50/50 dark:bg-gray-800/30 rounded-xl p-2.5 space-y-2">
             <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2">
+              <div class="flex items-center gap-1.5">
                 <span class="text-xs font-semibold text-gray-800 dark:text-gray-200">✏️ 自定义关键字</span>
-                <span class="text-[10px] font-mono px-1.5 py-0.2 rounded-full font-medium bg-gray-200/70 text-gray-600 dark:bg-gray-700/70 dark:text-gray-300 border border-gray-300/40 dark:border-gray-600/50">
-                  优先级 1
-                </span>
               </div>
               <span class="text-[11px] text-gray-400 dark:text-gray-500">支持正则</span>
             </div>
@@ -259,7 +246,7 @@ const ruleSummary = computed(() => {
           </div>
 
           <!-- 已选规则展示卡片 -->
-          <div v-if="selectedRules.length > 0" class="border border-gray-200/80 dark:border-gray-700/70 bg-gray-50/80 dark:bg-gray-800/40 rounded-xl p-3 space-y-2.5">
+          <div v-if="selectedRules.length > 0" class="border border-gray-200/80 dark:border-gray-700/70 bg-gray-50/80 dark:bg-gray-800/40 rounded-xl p-2.5 space-y-2">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2">
                 <span class="text-xs font-semibold text-gray-800 dark:text-gray-200">📋 已选规则</span>
