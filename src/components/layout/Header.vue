@@ -58,7 +58,6 @@ const emit = defineEmits(['logout']);
             :with-focus-ring="true"
             rounded-class="misub-radius-md"
             @open-settings="uiStore.show()"
-            @toggle-layout="uiStore.toggleLayout()"
             @logout="emit('logout')"
           />
         </div>

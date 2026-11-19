@@ -1,7 +1,6 @@
 <script setup>
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
-import { useUIStore } from '../../stores/ui.js';
 import { useSessionStore } from '../../stores/session.js';
 import { storeToRefs } from 'pinia';
 import BaseIcon from '../ui/BaseIcon.vue';
@@ -10,7 +9,6 @@ import NavActionGroup from './NavActionGroup.vue';
 import { MAIN_NAV_ITEMS } from '../../constants/navigation.js';
 
 const route = useRoute();
-const uiStore = useUIStore();
 const sessionStore = useSessionStore();
 const { publicConfig } = storeToRefs(sessionStore);
 const hideBranding = computed(() => publicConfig.value?.customPage?.enabled === true && publicConfig.value?.customPage?.hideBranding === true);
@@ -42,7 +40,6 @@ function isActive(path) {
       :hide-external-repo="hideBranding"
       :with-focus-ring="true"
       rounded-class="rounded-full"
-      @toggle-layout="uiStore.toggleLayout()"
       @logout="emit('logout')"
     />
   </header>
@@ -83,7 +80,6 @@ function isActive(path) {
           :with-focus-ring="true"
           :show-divider="true"
           rounded-class="rounded-full"
-          @toggle-layout="uiStore.toggleLayout()"
           @logout="emit('logout')"
         />
       </div>

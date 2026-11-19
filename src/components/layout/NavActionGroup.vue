@@ -40,7 +40,7 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['openSettings', 'toggleLayout', 'logout']);
+const emit = defineEmits(['openSettings', 'logout']);
 function buildBtnClass(type) {
   const base = ['nav-action-btn', props.roundedClass];
 
@@ -71,15 +71,6 @@ function buildBtnClass(type) {
         aria-label="打开设置"
       >
         <BaseIcon :path="NAV_ICONS.settings" className="h-5 w-5" />
-      </button>
-
-      <button
-        @click="emit('toggleLayout')"
-        :class="buildBtnClass('neutral')"
-        title="切换布局"
-        aria-label="切换布局"
-      >
-        <BaseIcon :path="NAV_ICONS.layout" className="h-5 w-5" />
       </button>
 
       <button
