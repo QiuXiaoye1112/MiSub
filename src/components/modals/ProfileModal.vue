@@ -6,10 +6,8 @@ import SubscriptionSelector from './ProfileModal/SubscriptionSelector.vue';
 import NodeSelector from './ProfileModal/NodeSelector.vue';
 import { useManualNodes } from '../../composables/useManualNodes.js';
 import { useDataStore } from '../../stores/useDataStore.js';
-import { useSettingsStore } from '../../stores/settings.js';
 
 const dataStore = useDataStore();
-const settingsStore = useSettingsStore();
 const { manualNodeGroups } = useManualNodes(dataStore.markDirty);
 
 const props = defineProps({
@@ -26,26 +24,6 @@ const localProfile = ref({});
 const subscriptionSearchTerm = ref('');
 const nodeSearchTerm = ref('');
 const activeManualNodeGroupFilter = ref(null);
-const showAdvanced = ref(false);
-const uiText = {
-  prefixTitle: '\u8282\u70b9\u524d\u7f00\u8bbe\u7f6e',
-  manualPrefixLabel: '\u624b\u52a8\u8282\u70b9\u524d\u7f00',
-  manualPrefixToggle: '\u624b\u52a8\u8282\u70b9\u524d\u7f00',
-  subscriptionPrefixToggle: '\u673a\u573a\u8ba2\u9605\u524d\u7f00',
-  enable: '\u542f\u7528',
-  disable: '\u7981\u7528'
-};
-const prefixToggleOptions = [
-{ label: '默认(全局)', value: null },
-{ label: '启用', value: true },
-{ label: '禁用', value: false }
-];
-
-const groupPrefixToggleOptions = [
-{ label: '默认(全局)', value: null },
-{ label: '启用', value: true },
-{ label: '禁用', value: false }
-];
 
 
 
@@ -170,57 +148,7 @@ const filteredManualNodes = computed(() => {
 
 watch(() => props.profile, (newProfile) => {
   if (newProfile) {
-    const profileCopy = JSON.parse(JSON.stringify(newProfile));
-    // Format date for input[type=date]
-    if (profileCopy.expiresAt) {
-      try {
-        profileCopy.expiresAt = new Date(profileCopy.expiresAt).toISOString().split('T')[0];
-      } catch (e) {
-        console.error("Error parsing expiresAt date:", e);
-        profileCopy.expiresAt = '';
-      }
-    }
-    if (!profileCopy.prefixSettings || typeof profileCopy.prefixSettings !== 'object') {
-      profileCopy.prefixSettings = {};
-    }
-    profileCopy.prefixSettings.enableManualNodes = profileCopy.prefixSettings.enableManualNodes ?? null;
-    profileCopy.prefixSettings.enableSubscriptions = profileCopy.prefixSettings.enableSubscriptions ?? null;
-    profileCopy.prefixSettings.manualNodePrefix = profileCopy.prefixSettings.manualNodePrefix ?? '';
-    profileCopy.prefixSettings.prependGroupName = profileCopy.prefixSettings.prependGroupName ?? null;
-    
-    if (Object.prototype.hasOwnProperty.call(profileCopy.prefixSettings, 'enableNodeEmoji')) {
-      delete profileCopy.prefixSettings.enableNodeEmoji;
-    }
-    
-    // 确保 subconverter 对象存在
-    if (!profileCopy.subconverter || typeof profileCopy.subconverter !== 'object') {
-      profileSub: profileCopy.subconverter = {
-        engineMode: '',
-        backend: '',
-        options: {
-          udp: null,
-          emoji: null,
-          scv: null,
-          sort: null,
-          tfo: null,
-          list: null
-        }
-      };
-    } else {
-      // 补充缺失的 options 字段，支持 null (即跟随全局)
-      profileCopy.subconverter.options = profileCopy.subconverter.options || {};
-      const fields = ['udp', 'emoji', 'scv', 'sort', 'tfo', 'list'];
-      fields.forEach(f => {
-        if (profileCopy.subconverter.options[f] === undefined) {
-          profileCopy.subconverter.options[f] = null;
-        }
-      });
-    }
-
-    // 确保 operators 数组存在
-    profileCopy.operators = Array.isArray(profileCopy.operators) ? profileCopy.operators : [];
-    
-    localProfile.value = profileCopy;
+    localProfile.value = JSON.parse(JSON.stringify(newProfile));
   } else {
     localProfile.value = {
       name: '',
@@ -228,16 +156,8 @@ watch(() => props.profile, (newProfile) => {
       subscriptions: [],
       manualNodes: [],
       customId: '',
-      expiresAt: '',
       isPublic: false,
-      description: '',
-      prefixSettings: {
-        enableManualNodes: null,
-        enableSubscriptions: null,
-        manualNodePrefix: '',
-        prependGroupName: null
-      },
-      operators: []
+      description: ''
     };
   }
 }, { deep: true, immediate: true });
@@ -245,18 +165,6 @@ watch(() => props.profile, (newProfile) => {
 const handleConfirm = () => {
   const profileToSave = JSON.parse(JSON.stringify(localProfile.value));
   profileToSave.isPublic = false;
-  if (profileToSave.expiresAt) {
-    try {
-      // Set time to the end of the selected day in local time, then convert to ISO string
-      const date = new Date(profileToSave.expiresAt);
-      date.setHours(23, 59, 59, 999);
-      profileToSave.expiresAt = date.toISOString();
-    } catch (e) {
-      console.error("Error processing expiresAt date:", e);
-      // Decide how to handle error: save as is, or clear it
-      profileToSave.expiresAt = '';
-    }
-  }
   // 顺序已由用户通过拖拽确定，无需额外排序
   emit('save', profileToSave);
 };
@@ -311,15 +219,7 @@ const updateSelectedIds = (listName, newIds) => {
     </template>
     <template #body>
       <div v-if="localProfile" class="space-y-4">
-        <ProfileForm 
-          :local-profile="localProfile" 
-          :show-advanced="showAdvanced" 
-          :ui-text="uiText"
-          :prefix-toggle-options="prefixToggleOptions" 
-          :group-prefix-toggle-options="groupPrefixToggleOptions"
-          :global-settings="dataStore.settings"
-          @toggle-advanced="showAdvanced = !showAdvanced" 
-        />
+        <ProfileForm :local-profile="localProfile" />
 
         <div class="grid grid-cols-1 items-start gap-4 md:grid-cols-2">
 
