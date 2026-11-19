@@ -13,12 +13,10 @@ const props = defineProps({
     required: true,
   },
   isSelectionMode: Boolean,
-  isSelected: Boolean,
-  pingResult: Object,
-  isPinging: Boolean
+  isSelected: Boolean
 });
 
-const emit = defineEmits(['delete', 'edit', 'toggle-select', 'filter-group', 'ping']);
+const emit = defineEmits(['delete', 'edit', 'toggle-select', 'filter-group']);
 const { showToast } = useToastStore();
 
 const getProtocol = (url) => {
@@ -124,9 +122,6 @@ const copyToClipboard = async (text) => {
 
             <!-- Header Actions for Mobile -->
             <div v-if="!isSelectionMode" class="flex shrink-0 items-center gap-0.5">
-              <button @click.stop="emit('ping')" class="rounded-md p-2 text-gray-400 transition-colors hover:bg-green-500/10 hover:text-green-500" title="测速" :disabled="isPinging" :class="{ 'animate-pulse text-green-500': isPinging }">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-              </button>
               <button @click.stop="copyToClipboard(node.url)" class="rounded-md p-2 text-gray-400 transition-colors hover:bg-primary-500/10 hover:text-primary-500" title="复制链接">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
               </button>
@@ -143,17 +138,6 @@ const copyToClipboard = async (text) => {
               <p class="flex-1 break-words text-sm font-semibold leading-snug text-gray-900 dark:text-white" :title="node.name">
                 {{ node.name || '未命名节点' }}
               </p>
-            <div v-if="pingResult" class="flex shrink-0 flex-row items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] font-medium"
-                 :class="{
-                    'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400': pingResult.status === 'ok' && pingResult.latency < 300,
-                    'bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400': pingResult.status === 'ok' && pingResult.latency >= 300,
-                    'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400': pingResult.status === 'error' || pingResult.status === 'timeout',
-                    'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400': pingResult.status === 'loading'
-                 }"
-            >
-              <svg v-if="pingResult.status === 'loading'" class="animate-spin h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-              <span v-if="pingResult.status === 'loading'">测速中</span><span v-else-if="pingResult.status === 'ok'">{{ pingResult.latency }}ms</span><span v-else>不通</span>
-            </div>
           </div>
 
           <p class="mt-1 text-xs text-gray-500 dark:text-gray-400 font-mono">
@@ -194,17 +178,6 @@ const copyToClipboard = async (text) => {
         <p class="truncate text-sm font-semibold text-gray-900 dark:text-white" :title="node.name">
           {{ node.name || '未命名节点' }}
         </p>
-        <div v-if="pingResult" class="flex shrink-0 flex-row items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] font-medium"
-             :class="{
-                'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400': pingResult.status === 'ok' && pingResult.latency < 300,
-                'bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400': pingResult.status === 'ok' && pingResult.latency >= 300,
-                'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400': pingResult.status === 'error' || pingResult.status === 'timeout',
-                'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400': pingResult.status === 'loading'
-             }"
-        >
-          <svg v-if="pingResult.status === 'loading'" class="animate-spin h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-          <span v-if="pingResult.status === 'loading'">测速中</span><span v-else-if="pingResult.status === 'ok'">{{ pingResult.latency }}ms</span><span v-else>不通</span>
-        </div>
       </div>
 
       <div class="min-w-0">
@@ -220,15 +193,6 @@ const copyToClipboard = async (text) => {
       </div>
 
       <div v-if="!isSelectionMode" class="shrink-0 flex items-center gap-1 opacity-100 transition-opacity duration-200 group-hover:opacity-100 lg:opacity-0">
-        <button 
-          @click.stop="emit('ping')" 
-          class="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md p-2 text-gray-400 transition-colors hover:bg-green-500/10 hover:text-green-500 lg:min-h-0 lg:min-w-0" 
-          title="测速"
-          :disabled="isPinging"
-          :class="{ 'animate-pulse text-green-500': isPinging }"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-        </button>
         <button 
           @click.stop="copyToClipboard(node.url)" 
           class="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md p-2 text-gray-400 transition-colors hover:bg-primary-500/10 hover:text-primary-500 lg:min-h-0 lg:min-w-0" 

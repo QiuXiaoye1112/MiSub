@@ -25,8 +25,7 @@ import {
     handleNodeCountRequest as handleLegacyNodeCountRequest,
     handleBatchUpdateNodesRequest,
     handleCleanNodesRequest,
-    handleHealthCheckRequest,
-    handleNodePingRequest
+    handleHealthCheckRequest
 } from './handlers/node-handler.js';
 import { handleClientRequest } from './handlers/client-handler.js';
 import { handleErrorReportRequest } from './handlers/error-report-handler.js';
@@ -341,9 +340,6 @@ export async function handleApiRequest(request, env) {
 
         case '/nodes/health':
             return await handleHealthCheckRequest(request, env);
-
-        case '/nodes/ping':
-            return await handleNodePingRequest(request, env);
 
         case '/nodes/clean':
             return await handleCleanNodesRequest(request, env);

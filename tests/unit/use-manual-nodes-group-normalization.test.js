@@ -8,10 +8,6 @@ vi.mock('../../src/stores/toast.js', () => ({
   useToastStore: () => ({ showToast: vi.fn() })
 }));
 
-vi.mock('../../src/utils/ping.js', () => ({
-  pingNode: vi.fn()
-}));
-
 describe('useManualNodes group normalization', () => {
   beforeEach(() => {
     setActivePinia(createPinia());

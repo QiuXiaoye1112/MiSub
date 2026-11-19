@@ -35,8 +35,7 @@ const {
   reorderManualNodes,
   manualNodeGroups, renameGroup, deleteGroup,
   activeGroupFilter, setGroupFilter, batchUpdateGroup, batchDeleteNodes,
-  manualNodesPerPage,
-  pingResults, pingingNodes, pingNodeId, pingAllNodes
+  manualNodesPerPage
 } = useManualNodes(markDirty);
 
 const handleSearchTermUpdate = (val) => {
@@ -139,10 +138,6 @@ const confirmBatchDelete = () => {
       @batch-update-group="(ids, group) => batchUpdateGroup(ids, group)"
       @batch-delete-nodes="handleBatchDeleteRequest"
       @open-batch-group-modal="handleOpenBatchGroupModal"
-      :ping-results="pingResults"
-      :pinging-nodes="pingingNodes"
-      @ping="pingNodeId"
-      @ping-all="pingAllNodes"
     />
 
     <ManualNodeEditModal v-model:show="showNodeModal" :is-new="isNewNode" :editing-node="editingNode"

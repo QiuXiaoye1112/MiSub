@@ -16,8 +16,6 @@ const props = defineProps({
   groups: { type: Array, default: () => [] },
   activeGroupFilter: { type: String, default: null }, // New
   itemsPerPage: { type: Number, default: 24 }, // Added
-  pingResults: { type: Object, default: () => ({}) },
-  pingingNodes: { type: Object, default: () => new Set() },
   compactGrid: { type: Boolean, default: false }
 });
 
@@ -26,9 +24,7 @@ const emit = defineEmits([
   'toggleSort', 'markDirty', 'autoSort', 'deduplicate', 'import', 'deleteAll', 'reorder',
   'rename-group', 'delete-group',
   'update:itemsPerPage', // Added
-  'open-batch-group-modal', // Added
-  'ping',
-  'ping-all'
+  'open-batch-group-modal' // Added
 ]);
 
 const isSelectionMode = ref(false);
@@ -163,7 +159,6 @@ const handleDeleteAll = () => {
       @toggle-sort="handleToggleSort"
       @delete-all="handleDeleteAll"
       @toggle-selection-mode="toggleSelectionMode"
-      @ping-all="emit('ping-all')"
     />
 
     <BulkOperations
@@ -199,10 +194,7 @@ const handleDeleteAll = () => {
       @sort-end="handleSortEnd"
       @change-page="handleChangePage"
       @set-group-filter="emit('set-group-filter', $event)"
-      :ping-results="pingResults"
-      :pinging-nodes="pingingNodes"
       :compact-grid="compactGrid"
-      @ping="emit('ping', $event)"
     />
   </div>
 </template>
