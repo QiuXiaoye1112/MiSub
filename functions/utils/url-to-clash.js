@@ -496,17 +496,24 @@ function parseSsUrl(url) {
 
         const atIndex = body.lastIndexOf('@');
         if (atIndex !== -1) {
-            // SIP002 格式: base64(method:password)@server:port
+            // SIP002 格式: base64(method:password)@server:port 或 SIP022 明文 method:password@server:port
             const userInfo = body.substring(0, atIndex);
-            const serverPart = body.substring(atIndex + 1);
+            const serverPart = body.substring(atIndex + 1).replace(/\/+$/, '');
 
             // 解码 userInfo
             let decoded;
+            let isPlainUserInfo = false;
             try {
-                let normalized = userInfo.replace(/-/g, '+').replace(/_/g, '/');
-                while (normalized.length % 4) normalized += '=';
-                decoded = atob(normalized);
+                if (userInfo.includes(':')) {
+                    isPlainUserInfo = true;
+                    decoded = userInfo;
+                } else {
+                    let normalized = userInfo.replace(/-/g, '+').replace(/_/g, '/');
+                    while (normalized.length % 4) normalized += '=';
+                    decoded = atob(normalized);
+                }
             } catch {
+                isPlainUserInfo = true;
                 decoded = userInfo;
             }
 
@@ -514,6 +521,13 @@ function parseSsUrl(url) {
             if (colonIndex !== -1) {
                 method = decoded.substring(0, colonIndex);
                 password = decoded.substring(colonIndex + 1);
+                if (isPlainUserInfo && password.includes('%')) {
+                    try {
+                        password = decodeURIComponent(password);
+                    } catch {
+                        // ignore malformed percent sequences
+                    }
+                }
             }
 
             const parsed = parseHostPort(serverPart);
@@ -528,7 +542,7 @@ function parseSsUrl(url) {
             const atIdx = decoded.lastIndexOf('@');
             if (atIdx !== -1) {
                 const userPart = decoded.substring(0, atIdx);
-                const serverPart = decoded.substring(atIdx + 1);
+                const serverPart = decoded.substring(atIdx + 1).replace(/\/+$/, '');
 
                 const colonIndex = userPart.indexOf(':');
                 if (colonIndex !== -1) {
@@ -560,16 +574,31 @@ function parseSsUrl(url) {
         if (pluginStr) {
             const pluginDetails = parseSsPlugin(pluginStr);
             if (pluginDetails) {
-                proxy.plugin = pluginDetails.name;
-                proxy['plugin-opts'] = pluginDetails.opts;
-                
-                // 协议兼容性映射 (TLS / Host)
-                if (pluginDetails.opts.tls || pluginDetails.opts.mode?.includes('tls') || pluginDetails.opts.security === 'tls') {
-                    proxy.tls = true;
-                }
-                if (pluginDetails.opts.host) {
-                    proxy.sni = pluginDetails.opts.host;
-                    proxy.servername = pluginDetails.opts.host;
+                const rawName = (pluginDetails.name || '').trim().toLowerCase();
+                const opts = pluginDetails.opts || {};
+
+                if (rawName === 'simple-obfs' || rawName === 'obfs-local' || rawName === 'obfs') {
+                    proxy.plugin = 'obfs';
+                    const normalizedOpts = {};
+                    const mode = opts.mode || opts.obfs;
+                    const host = opts.host || opts['obfs-host'];
+                    const uri = opts.uri || opts['obfs-uri'];
+                    if (mode) normalizedOpts.mode = mode;
+                    if (host) normalizedOpts.host = host;
+                    if (uri) normalizedOpts.uri = uri;
+                    proxy['plugin-opts'] = normalizedOpts;
+                } else {
+                    proxy.plugin = pluginDetails.name;
+                    proxy['plugin-opts'] = opts;
+
+                    // 协议兼容性映射 (TLS / Host，仅适用于 v2ray-plugin 等传输插件)
+                    if (opts.tls || (typeof opts.mode === 'string' && opts.mode.includes('tls')) || opts.security === 'tls') {
+                        proxy.tls = true;
+                    }
+                    if (opts.host) {
+                        proxy.sni = opts.host;
+                        proxy.servername = opts.host;
+                    }
                 }
             }
         }

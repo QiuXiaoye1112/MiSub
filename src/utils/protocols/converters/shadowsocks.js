@@ -13,53 +13,60 @@ export function convertShadowsocksToUrl(proxy) {
         const cipher = proxy.cipher;
         const password = proxy.password;
 
-        // 检测是否为 SS2022 格式 (2022-blake3-*)
-        const isSS2022 = cipher.startsWith('2022-blake3-');
+        // 检测是否为 SS2022 格式 (2022-*)
+        const isSS2022 = cipher.startsWith('2022-');
+        const host = proxy.server.includes(':') && !proxy.server.startsWith('[')
+            ? `[${proxy.server}]`
+            : proxy.server;
 
         let url;
 
         if (isSS2022) {
             // SS2022 格式: ss://method:password@server:port
             // 密码通常是 base64 格式，需要 URL 编码
-            url = `ss://${encodeURIComponent(cipher)}:${encodeURIComponent(password)}@${proxy.server}:${proxy.port}`;
+            url = `ss://${encodeURIComponent(cipher)}:${encodeURIComponent(password)}@${host}:${proxy.port}`;
         } else {
             // 传统格式: ss://base64(method:password)@server:port
             const userinfo = `${cipher}:${password}`;
             const encodedUserinfo = base64Encode(userinfo);
-            url = `ss://${encodedUserinfo}@${proxy.server}:${proxy.port}`;
+            url = `ss://${encodedUserinfo}@${host}:${proxy.port}`;
         }
 
-        // 插件参数
+        // 插件参数（遵循 SIP002: plugin=<name>;opt1=val1;opt2=val2）
         const params = new URLSearchParams();
 
         if (proxy.plugin) {
-            params.set('plugin', proxy.plugin);
+            const pluginName = (proxy.plugin === 'obfs' || proxy.plugin === 'simple-obfs')
+                ? 'obfs-local'
+                : proxy.plugin;
+            const pluginSegments = [pluginName];
 
             // 插件选项
             if (proxy['plugin-opts']) {
                 const opts = proxy['plugin-opts'];
-                const pluginOpts = [];
 
-                if (proxy.plugin === 'obfs' || proxy.plugin === 'obfs-local') {
-                    if (opts.mode) pluginOpts.push(`obfs=${opts.mode}`);
-                    if (opts.host) pluginOpts.push(`obfs-host=${opts.host}`);
+                if (proxy.plugin === 'obfs' || proxy.plugin === 'obfs-local' || proxy.plugin === 'simple-obfs') {
+                    const mode = opts.mode || opts.obfs;
+                    const obfsHost = opts.host || opts['obfs-host'];
+                    const obfsUri = opts.uri || opts['obfs-uri'];
+                    if (mode) pluginSegments.push(`obfs=${mode}`);
+                    if (obfsHost) pluginSegments.push(`obfs-host=${obfsHost}`);
+                    if (obfsUri) pluginSegments.push(`obfs-uri=${obfsUri}`);
                 } else if (proxy.plugin === 'v2ray-plugin') {
-                    if (opts.mode) pluginOpts.push(`mode=${opts.mode}`);
-                    if (opts.host) pluginOpts.push(`host=${opts.host}`);
-                    if (opts.path) pluginOpts.push(`path=${opts.path}`);
-                    if (opts.tls) pluginOpts.push('tls');
-                    if (opts.mux) pluginOpts.push('mux=true');
-                    if (opts['skip-cert-verify']) pluginOpts.push('skipCertVerify=true');
+                    if (opts.mode) pluginSegments.push(`mode=${opts.mode}`);
+                    if (opts.host) pluginSegments.push(`host=${opts.host}`);
+                    if (opts.path) pluginSegments.push(`path=${opts.path}`);
+                    if (opts.tls) pluginSegments.push('tls');
+                    if (opts.mux) pluginSegments.push('mux=true');
+                    if (opts['skip-cert-verify']) pluginSegments.push('skipCertVerify=true');
                 } else if (proxy.plugin === 'shadow-tls') {
-                    if (opts.host) pluginOpts.push(`host=${opts.host}`);
-                    if (opts.password) pluginOpts.push(`password=${opts.password}`);
-                    if (opts.version) pluginOpts.push(`version=${opts.version}`);
-                }
-
-                if (pluginOpts.length > 0) {
-                    params.set('plugin-opts', pluginOpts.join(';'));
+                    if (opts.host) pluginSegments.push(`host=${opts.host}`);
+                    if (opts.password) pluginSegments.push(`password=${opts.password}`);
+                    if (opts.version) pluginSegments.push(`version=${opts.version}`);
                 }
             }
+
+            params.set('plugin', pluginSegments.join(';'));
         }
 
         // UDP 支持
@@ -67,10 +74,10 @@ export function convertShadowsocksToUrl(proxy) {
             params.set('udp', proxy.udp ? '1' : '0');
         }
 
-        // 添加参数
+        // 添加参数（SIP002 规范使用 /?plugin=...）
         const paramsStr = params.toString();
         if (paramsStr) {
-            url += `?${paramsStr}`;
+            url += proxy.plugin ? `/?${paramsStr}` : `?${paramsStr}`;
         }
 
         // Fragment (节点名称)

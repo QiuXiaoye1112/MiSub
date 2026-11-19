@@ -4,7 +4,7 @@ import { storeToRefs } from 'pinia';
 import { useDataStore } from '../stores/useDataStore.js';
 import { useToastStore } from '../stores/toast.js'; // Restored
 import { extractNodeName, extractHostAndPort } from '../lib/utils.js';
-import { pingNode } from '../utils/ping.js';
+import { pingNode, pingNodeViaServer } from '../utils/ping.js';
 import { filterManualNodes, isManualNodeEntry } from './manual-nodes/filters.js';
 import { buildDedupPlan as buildDedupPlanCore } from './manual-nodes/dedup.js';
 import { buildAutoSortedSubscriptions } from './manual-nodes/sorting.js';
@@ -280,7 +280,14 @@ export function useManualNodes(markDirty) {
   
       try {
           // 由于 fetch ping 主要看 tcp 连通性，给个 3000ms 兜底即可
-          const result = await pingNode(host, port, 3000);
+          let result = await pingNode(host, port, 3000);
+          // HTTPS 页面下对纯 HTTP/obfs 端口发 HTTPS 探测可能因非 HTTP 握手挂起超时，回退到服务端 HTTP 探测
+          if (result?.status === 'timeout' && typeof pingNodeViaServer === 'function') {
+              const serverResult = await pingNodeViaServer(host, port, 3000);
+              if (serverResult?.status === 'ok') {
+                  result = serverResult;
+              }
+          }
           pingResults.value = { ...pingResults.value, [nodeId]: result };
       } catch(e) {
           pingResults.value = { ...pingResults.value, [nodeId]: { status: 'error', latency: -1 } };

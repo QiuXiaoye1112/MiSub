@@ -184,4 +184,14 @@ describe('Quantumult X 内置生成器', () => {
         expect(line).not.toContain('over-tls=true');
     });
 
+    it('should render Shadowsocks simple-obfs http plugin options', () => {
+        const node = 'ss://2022-blake3-aes-256-gcm:PYO0OMHeCny1V%2BpfA1M1CWvISpASYP81JF5QmhCEZpo%3D%3AJe7aoY9yW19kvQoTRhcPoc6Ub8rfrNh8gYkZaShE%2Fas%3D@dmit.20061112.xyz:2053/?plugin=obfs-local%3Bobfs%3Dhttp%3Bobfs-host%3Dwww.amd.com#SS2022-Ethan';
+        const generated = generateBuiltinQuanxConfig(node);
+        const line = generated.split('\n').find(item => item.startsWith('shadowsocks='));
+
+        expect(line).toContain('shadowsocks=dmit.20061112.xyz:2053, method=2022-blake3-aes-256-gcm');
+        expect(line).toContain('obfs=http');
+        expect(line).toContain('obfs-host=www.amd.com');
+    });
+
 });

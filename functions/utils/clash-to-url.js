@@ -16,9 +16,24 @@ export function convertClashProxyToUrl(proxy) {
         if (!server || !port) return null;
 
         if (type === 'ss' || type === 'shadowsocks') {
-            const userInfo = base64Encode(`${proxy.cipher}:${proxy.password}`);
+            const cipher = proxy.cipher || '';
+            const password = proxy.password || '';
+            const isSS2022 = /^2022-/i.test(cipher);
+            const userInfo = isSS2022
+                ? `${encodeURIComponent(cipher)}:${encodeURIComponent(password)}`
+                : base64Encode(`${cipher}:${password}`);
             let url = `ss://${userInfo}@${server}:${port}`;
-            if (proxy.plugin === 'anytls' || proxy.plugin === 'obfs-local') {
+            if (proxy.plugin === 'obfs' || proxy.plugin === 'obfs-local' || proxy.plugin === 'simple-obfs') {
+                const pluginOpts = proxy['plugin-opts'] || {};
+                const pluginParts = ['obfs-local'];
+                const obfsMode = pluginOpts.mode || pluginOpts.obfs || proxy.obfs;
+                const obfsHost = pluginOpts.host || pluginOpts['obfs-host'] || proxy['obfs-host'];
+                const obfsUri = pluginOpts.uri || pluginOpts['obfs-uri'] || proxy['obfs-uri'];
+                if (obfsMode) pluginParts.push(`obfs=${obfsMode}`);
+                if (obfsHost) pluginParts.push(`obfs-host=${obfsHost}`);
+                if (obfsUri) pluginParts.push(`obfs-uri=${obfsUri}`);
+                url += `/?plugin=${encodeURIComponent(pluginParts.join(';'))}`;
+            } else if (proxy.plugin === 'anytls') {
                 const params = [];
                 if (proxy.plugin) params.push(`plugin=${proxy.plugin}`);
                 const pluginOpts = proxy['plugin-opts'];

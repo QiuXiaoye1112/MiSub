@@ -87,4 +87,16 @@ describe('Built-in Sing-box generator', () => {
         expect(tuicNode?.tls?.server_name).toBe('tuic.example.com');
         expect(tuicNode?.tls?.insecure).toBe(true);
     });
+
+    it('should map SS2022 obfs-local plugin options for sing-box', () => {
+        const result = generateBuiltinSingboxConfig('ss://2022-blake3-aes-256-gcm:PYO0OMHeCny1V%2BpfA1M1CWvISpASYP81JF5QmhCEZpo%3D%3AJe7aoY9yW19kvQoTRhcPoc6Ub8rfrNh8gYkZaShE%2Fas%3D@dmit.20061112.xyz:2053/?plugin=obfs-local%3Bobfs%3Dhttp%3Bobfs-host%3Dwww.amd.com#SS2022-Ethan');
+        const parsed = JSON.parse(result);
+        const ssNode = parsed.outbounds.find(outbound => outbound.type === 'shadowsocks');
+
+        expect(ssNode?.server).toBe('dmit.20061112.xyz');
+        expect(ssNode?.server_port).toBe(2053);
+        expect(ssNode?.method).toBe('2022-blake3-aes-256-gcm');
+        expect(ssNode?.plugin).toBe('obfs-local');
+        expect(ssNode?.plugin_opts).toBe('obfs=http;obfs-host=www.amd.com');
+    });
 });

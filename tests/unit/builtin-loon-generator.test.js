@@ -27,4 +27,12 @@ describe('Loon 内置生成器', () => {
         expect(result).toContain('SameName = Shadowsocks');
         expect(result).toContain('SameName_1 = Shadowsocks');
     });
+
+    it('应将 SS2022 + obfs-local URL 转为 Loon obfs-name/obfs-host 参数', () => {
+        const node = 'ss://2022-blake3-aes-256-gcm:PYO0OMHeCny1V%2BpfA1M1CWvISpASYP81JF5QmhCEZpo%3D%3AJe7aoY9yW19kvQoTRhcPoc6Ub8rfrNh8gYkZaShE%2Fas%3D@dmit.20061112.xyz:2053/?plugin=obfs-local%3Bobfs%3Dhttp%3Bobfs-host%3Dwww.amd.com#SS2022-Ethan';
+        const result = generateBuiltinLoonConfig(node);
+        expect(result).toContain('SS2022-Ethan = Shadowsocks, dmit.20061112.xyz, 2053, 2022-blake3-aes-256-gcm');
+        expect(result).toContain('obfs-name=http');
+        expect(result).toContain('obfs-host=www.amd.com');
+    });
 });

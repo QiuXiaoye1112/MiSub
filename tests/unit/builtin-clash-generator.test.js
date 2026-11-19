@@ -59,4 +59,21 @@ describe('Clash 内置生成器', () => {
             expect(parsed.proxies[0]['udp-relay-mode']).toBe('native');
         }
     });
+
+    it('应将 SS2022 + obfs-local/?plugin= URL 正确转为 Clash/Mihomo obfs 插件配置', () => {
+        const node = 'ss://2022-blake3-aes-256-gcm:PYO0OMHeCny1V%2BpfA1M1CWvISpASYP81JF5QmhCEZpo%3D%3AJe7aoY9yW19kvQoTRhcPoc6Ub8rfrNh8gYkZaShE%2Fas%3D@dmit.20061112.xyz:2053/?plugin=obfs-local%3Bobfs%3Dhttp%3Bobfs-host%3Dwww.amd.com#SS2022-Ethan';
+        const parsed = yaml.load(generateProxiesOnly(node));
+
+        expect(parsed.proxies[0].type).toBe('ss');
+        expect(parsed.proxies[0].server).toBe('dmit.20061112.xyz');
+        expect(parsed.proxies[0].port).toBe(2053);
+        expect(parsed.proxies[0].cipher).toBe('2022-blake3-aes-256-gcm');
+        expect(parsed.proxies[0].password).toBe('PYO0OMHeCny1V+pfA1M1CWvISpASYP81JF5QmhCEZpo=:Je7aoY9yW19kvQoTRhcPoc6Ub8rfrNh8gYkZaShE/as=');
+        expect(parsed.proxies[0].plugin).toBe('obfs');
+        expect(parsed.proxies[0]['plugin-opts']).toEqual({
+            mode: 'http',
+            host: 'www.amd.com'
+        });
+        expect(parsed.proxies[0].tls).toBeUndefined();
+    });
 });

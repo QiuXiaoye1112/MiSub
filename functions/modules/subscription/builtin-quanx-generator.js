@@ -73,9 +73,11 @@ function buildQxLine(proxy) {
         const plugin = proxy.plugin || '';
         const opts = proxy['plugin-opts'] || proxy.pluginOpts || {};
 
-        if (plugin === 'obfs-local' || proxy.obfs) {
-            extraParts.push(`obfs=${proxy.obfs || opts.mode}`);
-            if (proxy['obfs-host'] || opts.host) extraParts.push(`obfs-host=${proxy['obfs-host'] || opts.host}`);
+        if (plugin === 'obfs' || plugin === 'obfs-local' || plugin === 'simple-obfs' || proxy.obfs) {
+            const obfsMode = proxy.obfs || opts.mode || opts.obfs;
+            if (obfsMode) extraParts.push(`obfs=${obfsMode}`);
+            const obfsHost = proxy['obfs-host'] || opts.host || opts['obfs-host'];
+            if (obfsHost) extraParts.push(`obfs-host=${obfsHost}`);
         } else if (plugin === 'v2ray-plugin' || opts.mode === 'websocket') {
             extraParts.push((opts.tls || opts.mode === 'websocket-tls') ? 'obfs=wss' : 'obfs=ws');
             if (opts.path) extraParts.push(`obfs-uri=${opts.path}`);

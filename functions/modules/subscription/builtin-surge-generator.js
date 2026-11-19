@@ -86,12 +86,12 @@ function clashProxyToSurgeResult(proxy) {
         const plugin = proxy.plugin || '';
         const opts = proxy['plugin-opts'] || proxy.pluginOpts || {};
 
-        if (plugin === 'obfs-local' || opts.mode === 'http' || opts.mode === 'tls' || proxy.obfs) {
-            const obfsMode = opts.mode || proxy.obfs;
+        if (plugin === 'obfs' || plugin === 'obfs-local' || plugin === 'simple-obfs' || opts.mode === 'http' || opts.mode === 'tls' || opts.obfs === 'http' || opts.obfs === 'tls' || proxy.obfs) {
+            const obfsMode = opts.mode || opts.obfs || proxy.obfs;
             if (obfsMode) parts.push(`obfs=${obfsMode}`);
-            const obfsHost = opts.host || proxy['obfs-host'];
+            const obfsHost = opts.host || opts['obfs-host'] || proxy['obfs-host'];
             if (obfsHost) parts.push(`obfs-host=${obfsHost}`);
-            const obfsUri = opts.uri || proxy['obfs-uri'];
+            const obfsUri = opts.uri || opts['obfs-uri'] || proxy['obfs-uri'];
             if (obfsUri) parts.push(`obfs-uri=${obfsUri}`);
         } else if (plugin === 'v2ray-plugin' || opts.mode === 'websocket') {
             // v2ray-plugin 映射为 Surge 原生 WS 支持

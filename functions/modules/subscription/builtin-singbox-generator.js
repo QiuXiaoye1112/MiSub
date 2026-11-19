@@ -45,7 +45,7 @@ function buildOutbound(proxy) {
         outbound.password = proxy.password || '';
         if (proxy.udp) outbound.udp_over_tcp = false;
 
-        // 插件支持 (v2ray-plugin 映射为 Sing-box transport)
+        // 插件支持 (v2ray-plugin 映射为 Sing-box transport; obfs 映射为 SIP003 plugin)
         const plugin = proxy.plugin || '';
         const opts = proxy['plugin-opts'] || proxy.pluginOpts || {};
         if (plugin === 'v2ray-plugin' || opts.mode === 'websocket') {
@@ -61,6 +61,16 @@ function buildOutbound(proxy) {
                     insecure: !!proxy['skip-cert-verify']
                 };
             }
+        } else if (plugin === 'obfs' || plugin === 'obfs-local' || plugin === 'simple-obfs' || proxy.obfs) {
+            const obfsMode = opts.mode || opts.obfs || proxy.obfs;
+            const obfsHost = opts.host || opts['obfs-host'] || proxy['obfs-host'];
+            const obfsUri = opts.uri || opts['obfs-uri'] || proxy['obfs-uri'];
+            outbound.plugin = 'obfs-local';
+            const pluginOpts = [];
+            if (obfsMode) pluginOpts.push(`obfs=${obfsMode}`);
+            if (obfsHost) pluginOpts.push(`obfs-host=${obfsHost}`);
+            if (obfsUri) pluginOpts.push(`obfs-uri=${obfsUri}`);
+            if (pluginOpts.length > 0) outbound.plugin_opts = pluginOpts.join(';');
         }
     } else if (type === 'vmess') {
         outbound.type = 'vmess';

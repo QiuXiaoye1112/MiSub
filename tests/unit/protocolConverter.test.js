@@ -384,5 +384,24 @@ anytls=Test AnyTLS, anytls.example.com, 443, password=anytls-pass, sni=example.c
             expect(loon.nodes[0].url).toContain('alpn=h2')
             expect(loon.nodes[0].url).toContain('allowInsecure=1')
         })
+
+        it('应将 Clash SS2022 + obfs 节点回转为标准 SIP002/SIP022 obfs-local URL', () => {
+            const proxy = {
+                name: 'SS2022-Ethan',
+                type: 'ss',
+                server: 'dmit.20061112.xyz',
+                port: 2053,
+                cipher: '2022-blake3-aes-256-gcm',
+                password: 'PYO0OMHeCny1V+pfA1M1CWvISpASYP81JF5QmhCEZpo=:Je7aoY9yW19kvQoTRhcPoc6Ub8rfrNh8gYkZaShE/as=',
+                plugin: 'obfs',
+                'plugin-opts': {
+                    mode: 'http',
+                    host: 'www.amd.com'
+                }
+            }
+
+            const result = convertClashProxyToUrl(proxy)
+            expect(result).toBe('ss://2022-blake3-aes-256-gcm:PYO0OMHeCny1V%2BpfA1M1CWvISpASYP81JF5QmhCEZpo%3D%3AJe7aoY9yW19kvQoTRhcPoc6Ub8rfrNh8gYkZaShE%2Fas%3D@dmit.20061112.xyz:2053/?plugin=obfs-local%3Bobfs%3Dhttp%3Bobfs-host%3Dwww.amd.com#SS2022-Ethan')
+        })
     })
 })

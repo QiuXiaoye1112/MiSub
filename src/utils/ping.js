@@ -31,7 +31,9 @@ export async function pingNode(host, port, timeoutMs = 3000) {
         
         // 规避浏览器缓存
         const cacheBuster = Date.now() + Math.random().toString(36).substring(7);
-        const testUrl = `${protocol}//${host}:${port}/__ping_${cacheBuster}`;
+        const cleanHost = String(host).trim().replace(/^\[|\]$/g, '');
+        const urlHost = cleanHost.includes(':') ? `[${cleanHost}]` : cleanHost;
+        const testUrl = `${protocol}//${urlHost}:${port}/__ping_${cacheBuster}`;
 
         fetch(testUrl, {
             mode: 'no-cors',
@@ -58,4 +60,56 @@ export async function pingNode(host, port, timeoutMs = 3000) {
             }
         });
     });
+}
+
+/**
+ * 通过服务端 HTTP 探测 fallback 检测非 TLS 文本协议端口（如 simple-obfs http）
+ * @param {string} host 节点服务器 IP 或域名
+ * @param {number|string} port 节点端口
+ * @param {number} timeoutMs 超时时间（毫秒）
+ * @returns {Promise<{status: 'ok'|'timeout'|'error', latency: number, via: 'server', message?: string}>}
+ */
+export async function pingNodeViaServer(host, port, timeoutMs = 3000) {
+    if (!host || !port) {
+        return { status: 'error', latency: -1, via: 'server', message: '无效的地址或端口' };
+    }
+
+    try {
+        const response = await fetch('/api/nodes/ping', {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                host,
+                port: Number(port),
+                timeoutMs
+            })
+        });
+
+        if (!response.ok) {
+            return {
+                status: 'error',
+                latency: -1,
+                via: 'server',
+                message: `服务端探测失败 (HTTP ${response.status})`
+            };
+        }
+
+        const data = await response.json();
+        return {
+            status: data?.status || 'error',
+            latency: typeof data?.latency === 'number' ? data.latency : -1,
+            via: data?.via || 'server',
+            message: data?.message
+        };
+    } catch (err) {
+        return {
+            status: 'error',
+            latency: -1,
+            via: 'server',
+            message: err?.message || '服务端探测失败'
+        };
+    }
 }

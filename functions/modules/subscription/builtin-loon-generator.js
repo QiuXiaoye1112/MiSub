@@ -92,11 +92,12 @@ function clashProxyToLoonResult(proxy) {
         const plugin = proxy.plugin || '';
         const opts = proxy['plugin-opts'] || proxy.pluginOpts || {};
 
-        if (plugin === 'obfs-local' || proxy.obfs) {
-            parts.push(`obfs-name=${proxy.obfs || opts.mode}`);
-            const host = proxy['obfs-host'] || opts.host;
+        if (plugin === 'obfs' || plugin === 'obfs-local' || plugin === 'simple-obfs' || proxy.obfs) {
+            const obfsMode = proxy.obfs || opts.mode || opts.obfs;
+            if (obfsMode) parts.push(`obfs-name=${obfsMode}`);
+            const host = proxy['obfs-host'] || opts.host || opts['obfs-host'];
             if (host) parts.push(`obfs-host=${loonQuote(host)}`);
-            const uri = proxy['obfs-uri'] || opts.uri;
+            const uri = proxy['obfs-uri'] || opts.uri || opts['obfs-uri'];
             if (uri) parts.push(`obfs-uri=${loonQuote(uri)}`);
         } else if (plugin === 'v2ray-plugin' || opts.mode === 'websocket') {
             // v2ray-plugin 在 Loon 中映射为 transport=ws

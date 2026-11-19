@@ -323,5 +323,13 @@ describe('Surge 内置生成器', () => {
             // 控制字符应被清理，节点仍能被处理
             expect(result).toContain('[Proxy]');
         });
+
+        it('应将 SS2022 + obfs-local URL 转为 Surge obfs 参数', () => {
+            const node = 'ss://2022-blake3-aes-256-gcm:PYO0OMHeCny1V%2BpfA1M1CWvISpASYP81JF5QmhCEZpo%3D%3AJe7aoY9yW19kvQoTRhcPoc6Ub8rfrNh8gYkZaShE%2Fas%3D@dmit.20061112.xyz:2053/?plugin=obfs-local%3Bobfs%3Dhttp%3Bobfs-host%3Dwww.amd.com#SS2022-Ethan';
+            const result = generateBuiltinSurgeConfig(node);
+            expect(result).toContain('SS2022-Ethan = ss, dmit.20061112.xyz, 2053, encrypt-method=2022-blake3-aes-256-gcm');
+            expect(result).toContain('obfs=http');
+            expect(result).toContain('obfs-host=www.amd.com');
+        });
     });
 });
